@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Your Portfolio Editor</title>
+    <link rel="icon" href="assets/book.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="editor.css" />
+    <script src="content.js" defer></script>
+    <script src="editor.js" defer></script>
+  </head>
+  <body class="editor-body">
+    <header class="editor-header">
+      <a href="index.html">← Portfolio</a
+      ><a href="guide.html">Help & picture guide</a>
+    </header>
+    <main class="editor-main">
+      <p class="handwritten">Make this journey your own</p>
+      <h1>Your Portfolio Editor</h1>
+      <p class="editor-intro">
+        Edit the words, add your pictures, then download one updated file.
+        <strong
+          >This is a local editing tool, not a password-protected admin
+          page.</strong
+        >
+        Nothing is sent to a server, and changes do not automatically appear on
+        a live website.
+      </p>
+      <ol class="editor-steps">
+        <li><span>1</span> Choose a chapter</li>
+        <li><span>2</span> Edit text & pictures</li>
+        <li><span>3</span> Export & replace content.js</li>
+      </ol>
+      <div class="editor-toolbar">
+        <button id="text-tab" class="button" aria-pressed="true">
+          Text & links</button
+        ><button id="picture-tab" class="button" aria-pressed="false">
+          Pictures</button
+        ><button id="export" class="button primary">Export content.js</button
+        ><button id="preview" class="button">Preview changes</button>
+      </div>
+      <p id="editor-status" role="status" aria-live="polite">
+        Ready. Export your changes before closing this tab.
+      </p>
+      <div id="text-panel">
+        <label for="chapter-choice">Choose a chapter</label
+        ><select id="chapter-choice"></select>
+        <div id="text-fields"></div>
+      </div>
+      <div id="picture-panel" hidden>
+        <h2>Your pictures</h2>
+        <p>
+          Upload JPG, PNG or WebP (maximum 8 MB per image). The editor resizes
+          large images to 1600 pixels and embeds a copy in your exported file,
+          so no separate picture upload is needed. Keep originals backed up. Add
+          a brief image description for screen-reader users.
+        </p>
+        <div id="picture-fields"></div>
+      </div>
+      <section class="editor-file-tools">
+        <h2>Continue or start over</h2>
+        <p>
+          To continue a previous editing session, select the
+          <code>content.js</code> you exported. Imports only read JSON data;
+          uploaded JavaScript is never executed. Your current edits stay in this
+          tab until you export them. Always keep a backup.
+        </p>
+        <label for="import-file">Import content.js</label
+        ><input id="import-file" type="file" accept=".js,.json" /><button
+          class="button"
+          id="reset"
+        >
+          Reset to loaded content
+        </button>
+        <p>
+          Reset returns to the <code>content.js</code> that was loaded when this
+          editor opened; it does not change files on your computer.
+        </p>
+      </section>
+      <section class="export-help">
+        <h2>After exporting</h2>
+        <p>
+          Find the downloaded file (usually in Downloads). Rename it exactly
+          <code>content.js</code>, then move it into your portfolio folder,
+          replacing the old file. Refresh <code>index.html</code> to see the
+          changes. If your site is online, upload the updated website folder
+          again. <a href="guide.html#publish">See publishing instructions.</a>
+        </p>
+        <p>
+          The preview is only for this session. If your browser blocks local
+          preview storage, export and replace the file instead.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#eee6f3" />
+    <meta
+      name="description"
+      content="An English teacher’s teaching journey, lesson plans, classroom practice and reflections. Editable demonstration portfolio."
+    />
+    <title>My Teaching Journey</title>
+    <link rel="icon" href="assets/book.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="content.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="mobile-bar">
+      <a href="#home">My Teaching Journey</a
+      ><button
+        id="menu-toggle"
+        aria-controls="sidebar"
+        aria-expanded="false"
+        aria-label="Open navigation"
+      >
+        ☰ <span>Chapters</span>
+      </button>
+    </div>
+    <button
+      id="drawer-overlay"
+      class="drawer-overlay"
+      aria-label="Close navigation"
+      hidden
+    ></button>
+    <aside id="sidebar" class="sidebar" aria-label="Portfolio sidebar">
+      <button id="menu-close" class="menu-close" aria-label="Close navigation">
+        Close ×</button
+      ><a class="brand" href="#home"
+        ><img src="assets/book.svg" alt="" width="96" height="70" /><span
+          id="brand-title"
+        ></span
+        ><small id="brand-subtitle"></small
+      ></a>
+      <nav id="navigation" aria-label="Portfolio chapters"></nav>
+      <div class="sidebar-end">
+        <span class="quote-mark">“</span>
+        <p id="sidebar-quote"></p>
+        <img
+          class="sidebar-botanical"
+          src="assets/botanical.svg"
+          alt=""
+          width="112"
+          height="130"
+        />
+      </div>
+      <div class="utility-links">
+        <a href="guide.html">How to personalise</a><span>·</span
+        ><a href="editor.html">Edit portfolio</a>
+      </div>
+    </aside>
+    <div class="site-body">
+      <main id="main" tabindex="-1"></main>
+      <footer>
+        <span id="footer-text" class="handwritten"></span
+        ><span class="heart" aria-hidden="true">♡</span>
+        <p id="demo-notice"></p>
+      </footer>
+    </div>
+    <dialog id="image-dialog" aria-labelledby="dialog-caption">
+      <button class="dialog-close" autofocus aria-label="Close image">×</button
+      ><img id="dialog-image" alt="" />
+      <h2 id="dialog-caption"></h2>
+      <p id="dialog-detail"></p>
+    </dialog>
+    <noscript
+      ><p>
+        This portfolio needs JavaScript enabled to show its editable chapters.
+        Printable resources and the guide remain available.
+      </p></noscript
+    >
+  </body>
+</html>

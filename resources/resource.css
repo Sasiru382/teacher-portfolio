@@ -1,0 +1,148 @@
+body {
+  font:
+    16px/1.7 Georgia,
+    serif;
+  color: #33283c;
+  background: #f6f0f8;
+  margin: 0;
+  padding: 25px;
+}
+main {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 42px;
+  border: 1px solid #d8c8e1;
+}
+h1 {
+  font-size: 34px;
+  line-height: 1.15;
+  color: #684a83;
+}
+h2 {
+  font-size: 22px;
+  margin-top: 26px;
+}
+p,
+li {
+  font-size: 16px;
+}
+li {
+  margin-bottom: 9px;
+}
+.notice {
+  font-size: 13px;
+  color: #76617f;
+}
+button,
+a {
+  font: 14px/1.4 sans-serif;
+  color: #654778;
+}
+button {
+  padding: 12px 17px;
+  min-height: 44px;
+  border: 1px solid #b79ac8;
+  background: #f1e8f6;
+  border-radius: 5px;
+  cursor: pointer;
+}
+header {
+  max-width: 884px;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #76538f;
+  outline-offset: 4px;
+}
+.lines {
+  border-bottom: 1px solid #cbbbd3;
+  min-height: 80px;
+  margin: 13px 0 23px;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.cards div {
+  border: 1px dashed #a58ab6;
+  padding: 30px 15px;
+  text-align: center;
+  font-size: 25px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 12px;
+  text-align: left;
+}
+td {
+  height: 45px;
+}
+@media (max-width: 550px) {
+  body {
+    padding: 15px;
+  }
+  main {
+    padding: 23px;
+  }
+  h1 {
+    font-size: 29px;
+  }
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+  header {
+    gap: 20px;
+  }
+  table {
+    font-size: 12px;
+  }
+  td,
+  th {
+    padding: 7px;
+  }
+}
+@media print {
+  body {
+    background: white;
+    padding: 0;
+  }
+  header {
+    display: none;
+  }
+  main {
+    border: 0;
+    padding: 12mm;
+    max-width: none;
+  }
+  .notice {
+    font-size: 12pt;
+  }
+  h1 {
+    font-size: 25pt;
+  }
+  p,
+  li {
+    font-size: 12pt;
+  }
+  h2 {
+    break-after: avoid;
+  }
+  .cards div {
+    break-inside: avoid;
+  }
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}

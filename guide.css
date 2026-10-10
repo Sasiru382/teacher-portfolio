@@ -1,0 +1,245 @@
+.guide-top {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 23px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  gap: 15px;
+}
+.guide {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 37px 30px 60px;
+}
+.guide > h1 {
+  font-size: 55px;
+  margin: 8px 0 20px;
+}
+.guide-lead {
+  font-size: 17px;
+  max-width: 790px;
+}
+.guide-contents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 28px 0 36px;
+}
+.guide-contents a {
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 9px 13px;
+  background: #f1e8f5;
+  min-height: 44px;
+  font-size: 12px;
+}
+.guide > section {
+  border-top: 1px solid var(--border);
+  padding-top: 29px;
+  margin-top: 30px;
+  scroll-margin-top: 25px;
+}
+.guide h2 {
+  font-size: 34px;
+  margin: 0 0 18px;
+}
+.guide h3 {
+  font-size: 27px;
+  margin: 26px 0 16px;
+}
+.guide p,
+.guide li {
+  font-size: 14px;
+  line-height: 1.85;
+}
+.guide ol {
+  padding-left: 22px;
+}
+.guide li {
+  padding-left: 4px;
+  margin-bottom: 12px;
+}
+.guide .note {
+  background: #eee5f3;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 21px;
+  font-size: 13px;
+}
+.guide-split {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 35px;
+  align-items: start;
+}
+.folder-diagram {
+  background: #f2eaf6;
+  border: 1px solid var(--border);
+  padding: 25px;
+  border-radius: 8px;
+  margin-top: 3px;
+  font: 14px/1.8 monospace;
+  display: grid;
+  gap: 9px;
+}
+.folder-diagram > span {
+  padding-left: 20px;
+  border-left: 1px solid #c8b4d6;
+  margin-left: 10px;
+  display: block;
+}
+.folder-diagram small {
+  display: block;
+  font: 11px/1.4 var(--sans);
+  color: #685071;
+}
+.guide-polaroid {
+  background: #fff;
+  padding: 10px 10px 20px;
+  border: 1px solid #ddd0e3;
+  transform: rotate(3deg);
+  width: 240px;
+  max-width: 95%;
+  margin: 40px auto 15px;
+  box-shadow: 0 3px 7px #674c7d12;
+}
+.guide-polaroid img {
+  aspect-ratio: 4/4.5;
+  object-fit: cover;
+}
+.guide-polaroid figcaption {
+  font: 28px/1.1 var(--hand);
+  color: var(--purple);
+  text-align: center;
+  margin-top: 13px;
+}
+.table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 22px 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.guide table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.guide td,
+.guide th {
+  text-align: left;
+  border-bottom: 1px solid #e2d7e7;
+  padding: 13px;
+  vertical-align: top;
+}
+.guide th {
+  background: #ece1f3;
+  color: #5e4574;
+  font-weight: 700;
+}
+.guide tr:nth-child(even) {
+  background: #f6f0f8;
+}
+.guide td {
+  line-height: 1.6;
+}
+.guide code {
+  font-size: 0.9em;
+  padding: 2px 4px;
+  background: #eae0ef;
+  border-radius: 3px;
+  overflow-wrap: anywhere;
+}
+.publish-checklist {
+  list-style: none;
+  padding: 0;
+}
+.publish-checklist li {
+  padding: 0 0 0 28px;
+  position: relative;
+}
+.publish-checklist li:before {
+  content: "□";
+  position: absolute;
+  left: 0;
+  color: #7e5f95;
+  font-size: 22px;
+}
+.guide details {
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  background: #fcf9fc;
+  margin: 12px 0;
+  border-radius: 5px;
+}
+.guide summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 30px;
+}
+.guide details p {
+  margin: 12px 0 0;
+}
+.guide-footer {
+  margin-top: 38px;
+  padding: 30px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.guide-footer p {
+  font-size: 30px;
+}
+.guide-footer a {
+  margin-top: 13px;
+}
+@media (max-width: 700px) {
+  .guide {
+    padding: 26px 20px 40px;
+  }
+  .guide > h1 {
+    font-size: 40px;
+  }
+  .guide h2 {
+    font-size: 30px;
+  }
+  .guide-top {
+    padding: 19px 20px;
+  }
+  .guide-top > a:first-child {
+    font-size: 13px;
+  }
+  .guide-top .button {
+    font-size: 11px;
+  }
+  .guide-split {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .guide-polaroid {
+    margin: 10px auto 25px;
+    width: 190px;
+  }
+  .guide-contents {
+    gap: 7px;
+  }
+  .guide table {
+    font-size: 11px;
+    min-width: 660px;
+  }
+  .guide li,
+  .guide p {
+    font-size: 13px;
+  }
+  .guide .note {
+    padding: 17px;
+  }
+  .folder-diagram {
+    max-width: 400px;
+  }
+  .guide-lead {
+    font-size: 15px !important;
+  }
+}
