@@ -1,0 +1,3 @@
+# Keep content.js JSON-shaped after its window assignment so imports and
+# GitHub conflict checks can parse data without evaluating JavaScript.
+content.js

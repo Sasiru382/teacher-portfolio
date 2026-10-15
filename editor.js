@@ -28,9 +28,75 @@
     key
       .replace(/([a-z])([A-Z])/g, "$1 $2")
       .replace(/^./, (x) => x.toUpperCase());
+  let dirty = false;
+  let baseContent = original;
+  let baseSha = null;
+  let processing = 0;
+  let busy = false;
+  const draftKey = location.pathname;
   function changed() {
-    status("Unsaved changes in this tab. Export content.js to keep them.");
+    dirty = true;
+    status(
+      "Unsaved changes. Choose Save draft to keep them in this browser, or Publish to website.",
+    );
   }
+  window.addEventListener("beforeunload", (event) => {
+    if (dirty || processing || busy) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
+  function draftStore(mode, value) {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("teacher-portfolio-drafts", 1);
+      request.onupgradeneeded = () =>
+        request.result.createObjectStore("drafts");
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(Error("Storage blocked"));
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction("drafts", mode);
+        const store = tx.objectStore("drafts");
+        const operation =
+          mode === "readonly"
+            ? store.get(draftKey)
+            : store.put(value, draftKey);
+        tx.oncomplete = () => {
+          db.close();
+          resolve(operation.result);
+        };
+        tx.onerror = tx.onabort = () => {
+          db.close();
+          reject(tx.error);
+        };
+      };
+    });
+  }
+  async function saveDraft() {
+    if (processing) {
+      status("Wait for picture processing before saving.");
+      return false;
+    }
+    const snapshot = JSON.stringify(draft);
+    try {
+      await draftStore("readwrite", {
+        content: JSON.parse(snapshot),
+        baseContent,
+        baseSha,
+      });
+      if (snapshot === JSON.stringify(draft)) dirty = false;
+      status(
+        "Draft saved in this browser only. The public website has not changed.",
+      );
+      return true;
+    } catch (_) {
+      status(
+        "Draft could not be saved: browser storage is blocked or full. Export content.js now as a backup. Your edits remain in this tab.",
+      );
+      return false;
+    }
+  }
+  $("#save-draft").addEventListener("click", saveDraft);
   function renderFields() {
     const area = $("#text-fields");
     area.replaceChildren();
@@ -138,6 +204,13 @@
           status("Please choose a JPG, PNG or WebP picture smaller than 8 MB.");
           return;
         }
+        if (busy || processing) {
+          status("Wait for the current action to finish.");
+          return;
+        }
+        processing++;
+        $("#publish").disabled = true;
+        status("Processing picture… wait before saving or publishing.");
         try {
           const bitmap = await createImageBitmap(f);
           const scale = Math.min(
@@ -163,6 +236,9 @@
           status(
             "This picture could not be read. Try a different JPG, PNG or WebP file.",
           );
+        } finally {
+          processing--;
+          $("#publish").disabled = busy || !ready;
         }
       });
       fields.append(uploadLabel, input);
@@ -232,6 +308,11 @@
     );
   });
   $("#import-file").addEventListener("change", async (e) => {
+    if (processing || busy) {
+      status("Wait for the current action to finish.");
+      e.target.value = "";
+      return;
+    }
     const file = e.target.files[0];
     if (!file) return;
     try {
@@ -270,11 +351,12 @@
       };
       if (!shape(JSON.parse(original), imported)) throw Error("shape");
       draft = imported;
+      dirty = true;
       choices();
       renderFields();
       pictureFields();
       status(
-        "Imported your content. Review it, then export any further changes.",
+        "Imported your content. Review it, then Save draft, export a backup, or publish.",
       );
     } catch (_) {
       status(
@@ -284,6 +366,10 @@
     e.target.value = "";
   });
   $("#reset").addEventListener("click", () => {
+    if (processing || busy) {
+      status("Wait for the current action to finish.");
+      return;
+    }
     if (
       !confirm(
         "Discard current edits and return to the content loaded when this editor opened?",
@@ -291,6 +377,7 @@
     )
       return;
     draft = JSON.parse(original);
+    changed();
     choices();
     renderFields();
     pictureFields();
@@ -306,7 +393,7 @@
       );
       window.open("index.html?preview=1#home", "_blank");
       status(
-        "Preview opened. It is temporary; export content.js to save your changes.",
+        "Preview opened. It is temporary; Save draft keeps edits locally, Publish updates the website.",
       );
     } catch (_) {
       status(
@@ -314,6 +401,284 @@
       );
     }
   });
-  choices();
-  renderFields();
+  // Fixed publishing scope. Fork owners must update this and the visible setup text.
+  const repository = "Sasiru382/teacher-portfolio";
+  const branch = "main";
+  const api = `https://api.github.com/repos/${repository}/contents/content.js`;
+  const publishStatus = (message) =>
+    ($("#publish-status").textContent = message);
+  let conflict = false;
+  let ready = false;
+  function parseContent(text) {
+    const stripped = text.replace(/^\s*\/\*[\s\S]*?\*\/\s*/, "");
+    const match = stripped.match(
+      /^\s*window\.PORTFOLIO_CONTENT\s*=\s*([\s\S]+?)\s*;?\s*$/,
+    );
+    const value = JSON.parse(match ? match[1] : stripped);
+    function shape(base, item) {
+      if (!base || typeof base !== "object") return typeof base === typeof item;
+      if (Array.isArray(base))
+        return (
+          Array.isArray(item) &&
+          base.length === item.length &&
+          base.every((v, i) => shape(v, item[i]))
+        );
+      return (
+        item &&
+        Object.keys(base).every(
+          (k) => Object.hasOwn(item, k) && shape(base[k], item[k]),
+        )
+      );
+    }
+    if (
+      !shape(JSON.parse(original), value) ||
+      JSON.stringify(value.pages.map((p) => p.id)) !==
+        JSON.stringify(JSON.parse(original).pages.map((p) => p.id))
+    )
+      throw Error(
+        "Remote content has an incompatible format. Export your draft and ask the owner for help.",
+      );
+    return value;
+  }
+  const serialize = () =>
+    "/* Portfolio content. */\nwindow.PORTFOLIO_CONTENT = " +
+    JSON.stringify(draft, null, 2) +
+    ";\n";
+  function encode(text) {
+    let binary = "";
+    for (const byte of new TextEncoder().encode(text))
+      binary += String.fromCharCode(byte);
+    return btoa(binary);
+  }
+  function decode(text) {
+    return new TextDecoder("utf-8", { fatal: true }).decode(
+      Uint8Array.from(atob(text.replace(/\s/g, "")), (c) => c.charCodeAt(0)),
+    );
+  }
+  async function request(url, token = "", options = {}) {
+    let response;
+    try {
+      response = await fetch(url, {
+        ...options,
+        cache: "no-store",
+        signal: AbortSignal.timeout(25000),
+        headers: {
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...options.headers,
+        },
+      });
+    } catch (_) {
+      throw Error(
+        "Network request failed or timed out. Keep/export your draft; check GitHub before retrying if a commit may have been sent.",
+      );
+    }
+    if (!response.ok) {
+      const messages = {
+        401: "GitHub rejected the token (401). Create a new unexpired token.",
+        403: "GitHub denied permission or rate limited this request (403). Check repository write access, token Contents read/write, approval requirements, or try later.",
+        404: "Repository or content.js not found or inaccessible (404). Check account access and token repository selection.",
+        409: "Conflict (409): repository changed. Export your draft, then explicitly reload remote content.",
+        422: "GitHub refused this update (422). Possible conflict or branch protection: export your draft, check repository rules, then reload remote content.",
+      };
+      if ([409, 422].includes(response.status)) conflict = true;
+      throw Error(
+        messages[response.status] ||
+          `GitHub request failed (${response.status}). Keep your draft and check repository status.`,
+      );
+    }
+    return response;
+  }
+  async function remote(token = "") {
+    const url = `${api}?ref=${branch}&t=${Date.now()}`;
+    const data = await (await request(url, token)).json();
+    let text;
+    if (data.encoding === "none" || !data.content) {
+      text = await (
+        await request(url, token, {
+          headers: { Accept: "application/vnd.github.raw+json" },
+        })
+      ).text();
+    } else text = decode(data.content);
+    if (!data.sha)
+      throw Error("GitHub did not return a file version. Publishing stopped.");
+    return {
+      sha: data.sha,
+      text,
+      canonical: JSON.stringify(parseContent(text)),
+    };
+  }
+  function checkBase(current) {
+    if (
+      current.canonical !== baseContent ||
+      (baseSha && current.sha !== baseSha)
+    ) {
+      conflict = true;
+      publishStatus(
+        "Conflict: remote content changed since your base version. Export your draft as a backup, then choose Reload remote content. Reapply your edits to the new version; no overwrite was sent.",
+      );
+      return false;
+    }
+    baseSha = current.sha;
+    conflict = false;
+    return true;
+  }
+  function lock(value) {
+    busy = value;
+    document.querySelectorAll("button,input,textarea,select").forEach((el) => {
+      el.disabled = value;
+    });
+    $("#publish").disabled = value || processing > 0 || !ready;
+  }
+  $("#publish").addEventListener("click", async () => {
+    if (busy || processing || !ready) return;
+    let token = $("#github-token").value.trim();
+    $("#github-token").value = "";
+    let committed = false;
+    try {
+      if (!token) {
+        publishStatus(
+          "Enter your GitHub token to publish. Anonymous publishing is not allowed.",
+        );
+        return;
+      }
+      if (conflict) {
+        publishStatus(
+          "Conflict: export your draft first, then Reload remote content before publishing.",
+        );
+        return;
+      }
+      if (
+        !confirm(
+          `Publish all current text and embedded photos publicly to ${repository}, content.js on ${branch}? This replaces website content after tests and deployment. New local files are not uploaded. Confirm you have reviewed privacy and have permission to publish.`,
+        )
+      )
+        return;
+      lock(true);
+      publishStatus("Checking the latest repository version…");
+      const current = await remote(token);
+      if (!checkBase(current)) return;
+      await saveDraft();
+      const text = serialize();
+      publishStatus("Sending content to GitHub. Do not close this tab…");
+      const result = await (
+        await request(api, token, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: "Update portfolio content from editor",
+            content: encode(text),
+            sha: current.sha,
+            branch,
+          }),
+        })
+      ).json();
+      committed = true;
+      publishStatus(
+        "GitHub accepted the update; verifying the committed content…",
+      );
+      const verified = await remote(token);
+      if (
+        !result.content?.sha ||
+        verified.sha !== result.content.sha ||
+        verified.text !== text
+      ) {
+        conflict = true;
+        throw Error(
+          "Commit may exist, but remote verification did not match. Do not assume success or retry blindly. Check GitHub Actions and content.js; export your draft before reloading remote content.",
+        );
+      }
+      baseContent = verified.canonical;
+      baseSha = verified.sha;
+      const saved = await saveDraft();
+      publishStatus(
+        `Changes committed; deployment pending${result.commit?.sha ? " (commit " + result.commit.sha.slice(0, 12) + ")" : ""}. ${saved ? "Draft saved locally." : "Local save failed: export a backup."} Open GitHub Actions and wait for this commit’s Test and deploy portfolio run to succeed, then refresh and check the website. This editor has not verified the live website.`,
+      );
+    } catch (error) {
+      publishStatus(
+        (committed
+          ? "Update sent, but verification is incomplete. "
+          : "Publishing stopped. ") +
+          error.message +
+          " Your draft is still available.",
+      );
+    } finally {
+      token = "";
+      $("#github-token").value = "";
+      lock(false);
+    }
+  });
+  $("#reload-remote").addEventListener("click", async () => {
+    if (busy || processing) return;
+    let token = $("#github-token").value.trim();
+    $("#github-token").value = "";
+    try {
+      if (
+        !confirm(
+          "Export content.js FIRST to back up your edits. Reload remote content will REPLACE this draft with the current GitHub version, not merge it. Continue?",
+        )
+      )
+        return;
+      lock(true);
+      const current = await remote(token);
+      draft = parseContent(current.text);
+      baseContent = current.canonical;
+      baseSha = current.sha;
+      conflict = false;
+      dirty = true;
+      choices();
+      renderFields();
+      pictureFields();
+      await saveDraft();
+      publishStatus(
+        "Remote content loaded. Reapply edits from your exported backup carefully. This did not publish anything.",
+      );
+    } catch (error) {
+      publishStatus(error.message + " Your previous draft remains available.");
+    } finally {
+      token = "";
+      $("#github-token").value = "";
+      lock(false);
+    }
+  });
+  async function initialize() {
+    try {
+      const saved = await draftStore("readonly");
+      if (saved) {
+        draft = parseContent(JSON.stringify(saved.content));
+        if (typeof saved.baseContent !== "string")
+          throw Error("Invalid saved base");
+        baseContent = saved.baseContent;
+        baseSha = saved.baseSha;
+        status("Saved draft restored from this browser. Not published.");
+      } else status("Ready. Save draft keeps edits in this browser only.");
+    } catch (_) {
+      status(
+        "Browser draft storage unavailable. Export content.js before closing to keep your work.",
+      );
+    }
+    choices();
+    renderFields();
+    if (location.protocol !== "file:") {
+      try {
+        if (checkBase(await remote()))
+          publishStatus(
+            "Repository version checked. Publishing requires your GitHub token and confirmation.",
+          );
+      } catch (error) {
+        publishStatus(
+          "Could not check repository now. " +
+            error.message +
+            " It will be checked again before publishing.",
+        );
+      }
+    } else
+      publishStatus(
+        "Offline editing available. Publishing requires an internet connection and a fresh repository version check.",
+      );
+    ready = true;
+    $("#publish").disabled = processing > 0;
+  }
+  initialize();
 })();

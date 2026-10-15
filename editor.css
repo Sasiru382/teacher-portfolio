@@ -197,6 +197,22 @@
 .editor-file-tools button {
   margin-bottom: 15px;
 }
+#publish-status {
+  padding: 14px;
+  background: #fffdfb;
+  border-left: 4px solid #9473aa;
+  overflow-wrap: anywhere;
+}
+#publishing .button {
+  margin: 14px 8px 0 0;
+}
+.editor-main button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.editor-main input[type="password"] {
+  max-width: 640px;
+}
 code {
   background: #e6dceb;
   font-size: 0.93em;

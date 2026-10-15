@@ -52,9 +52,9 @@
             </ol>
             <p class="note">
               The editor is not a login or a private admin system. It edits a
-              draft only in your browser tab. It does not write files
-              automatically or update a published site. All files you publish
-              are public.
+              draft in your browser. Save draft persists it on this device, not
+              the website. Publish to website requires GitHub permission and
+              explicit confirmation. All published files are public.
             </p>
           </div>
           <div class="folder-diagram" aria-label="Folder organisation">
@@ -118,11 +118,12 @@
           </li>
         </ol>
         <p class="note">
-          Do not close the editor before exporting. A downloaded file is your
-          backup. Use <strong>Import content.js</strong> to continue from an
-          earlier export. <strong>Reset to loaded content</strong> discards tab
-          edits and returns to the file loaded when the editor opened; it does
-          not change your files.
+          Save draft before closing; export regularly too. A downloaded file is
+          your backup. Use <strong>Import content.js</strong> to continue from
+          an earlier export. <strong>Reset to loaded content</strong> discards
+          tab edits and returns to the file loaded when the editor opened; save
+          afterward to replace your stored draft. It does not change the public
+          website.
         </p>
       </section>
       <section id="pictures">
@@ -442,7 +443,109 @@
           The site uses plain HTML, CSS and JavaScript. It can be hosted by any
           static host.
         </p>
-        <h3>Drag-and-drop with Netlify</h3>
+        <h3 id="github-publish">
+          Update this GitHub website: save first, publish second
+        </h3>
+        <ol>
+          <li>
+            Use <strong>Save draft</strong> in the editor to keep text and
+            embedded photos in this browser. Reopen the same editor address in
+            the same browser profile to restore it. Save draft does not publish.
+            Other people using that browser profile can see drafts; clearing
+            browser data/private browsing can lose them. Export content.js
+            regularly as a portable backup.
+          </li>
+          <li>
+            Sign into
+            <a href="https://github.com/login" target="_blank" rel="noopener"
+              >GitHub</a
+            >
+            separately using your own account. The editor does not have its own
+            login. Your account needs write access to
+            <strong>Sasiru382/teacher-portfolio</strong>.
+          </li>
+          <li>
+            Owner setup: in that repository, open
+            <strong>Settings → Collaborators → Add people</strong>, invite the
+            teacher's GitHub username and ask them to accept. No invitation is
+            sent automatically.
+          </li>
+          <li>
+            In your GitHub account settings, choose
+            <strong
+              >Developer settings → Personal access tokens → Fine-grained tokens
+              → Generate new token</strong
+            >. Set a short expiry, choose the repository owner, then
+            <strong>Only select repositories → teacher-portfolio</strong>. Set
+            <strong>Repository permissions → Contents → Read and write</strong>.
+            No Workflows write permission is needed. GitHub may require
+            organisation approval or enforce branch rules.
+          </li>
+          <li>
+            GitHub currently does not support fine-grained tokens for
+            outside/repository collaborators (<a
+              href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#fine-grained-personal-access-tokens-limitations"
+              >GitHub limitations</a
+            >). If the teacher is a collaborator on this personal repository,
+            stop at token setup. Ask the owner to publish with their own
+            restricted token, or use a teacher-owned fork configured by a
+            developer. Do not share an owner's token or broaden access as a
+            workaround.
+          </li>
+          <li>
+            Paste the token only into the editor's masked
+            <strong>GitHub token</strong> field. It is used in memory for this
+            action and cleared after success, failure or cancellation; it is
+            never put in drafts, exports, browser storage or URLs. Decline
+            browser password-save prompts and revoke the token in GitHub when
+            finished. Never put it into a portfolio text field. Use only the
+            trusted site and browser.
+          </li>
+          <li>
+            Review the privacy checklist, save and export a backup, then click
+            <strong>Publish to website</strong>. Confirm the public scope:
+            <strong>content.js in Sasiru382/teacher-portfolio, main</strong>.
+            Text and embedded photos are sent to GitHub. New local images/PDFs
+            must be uploaded separately; this button only changes content.js.
+          </li>
+          <li>
+            If you see a conflict, <strong>export your draft first</strong>.
+            Choose <strong>Reload remote content</strong> and confirm replacing
+            your draft with GitHub's version. Reapply your edits carefully using
+            the exported backup. The editor will not silently overwrite someone
+            else's changes.
+          </li>
+          <li>
+            <strong>Changes committed; deployment pending</strong> is not a
+            live-site confirmation. Open
+            <a
+              href="https://github.com/Sasiru382/teacher-portfolio/actions"
+              target="_blank"
+              rel="noopener"
+              >GitHub Actions</a
+            >
+            and find the commit shown in the editor. Wait for
+            <strong>Test and deploy portfolio</strong> to succeed, then refresh
+            the public website and check it. If queued, wait. If failed, keep
+            your draft and ask the owner to inspect the failed job. The editor
+            does not poll CI or verify the live site.
+          </li>
+          <li>
+            401 means the token is invalid/expired; 403 can mean missing
+            permission or rate limits; 404 can mean missing repository access;
+            409/422 means a conflict or repository rule may block publishing.
+            Export before reloading. For a network failure, check GitHub before
+            retrying in case the commit already arrived.
+          </li>
+        </ol>
+        <p class="note">
+          Contents write permission covers repository files, not just
+          content.js. Keep tokens short-lived, never share them and restrict
+          them to this repository. Export/import and offline preview still work
+          without GitHub. If browser storage fails, export immediately before
+          closing.
+        </p>
+        <h3>Alternative: drag-and-drop with Netlify</h3>
         <ol>
           <li>
             Finish the privacy and demo-content checklist below before going
@@ -488,8 +591,8 @@
           </li>
         </ol>
         <p>
-          This package has not been published or uploaded anywhere. You control
-          when and where to make it public. Hash links such as
+          This portfolio is configured for GitHub Pages. You control when to
+          publish edits. Hash links such as
           <code>index.html#about-me</code> work without server routing rules.
         </p>
       </section>
@@ -559,10 +662,10 @@
         </ul>
         <p class="note">
           Publishing the editor does not expose a secret backend: anyone can
-          open it and edit their own local draft, but cannot overwrite your
-          hosted files. However, every uploaded website file is public. Never
-          include credentials, consent records or private backups in the
-          publishing folder.
+          open it and edit their own local draft, but only an authorised GitHub
+          token can publish to your repository. However, every uploaded website
+          file is public. Never include credentials, consent records or private
+          backups in the publishing folder.
         </p>
       </section>
       <section>
@@ -570,10 +673,10 @@
         <details>
           <summary>My changes are not showing</summary>
           <p>
-            Export from the editor, rename the download exactly content.js,
-            replace the file beside index.html, and refresh. Editing a tab alone
-            does not change the site. For a live site, redeploy the updated
-            folder too.
+            Save draft stores edits locally only. Use Publish to website with
+            GitHub permission, wait for the matching Actions run to succeed,
+            then refresh the website. Alternatively export content.js, replace
+            the local file and redeploy/upload it manually.
           </p>
         </details>
         <details>

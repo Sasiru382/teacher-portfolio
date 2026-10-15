@@ -19,29 +19,27 @@
       <p class="handwritten">Make this journey your own</p>
       <h1>Your Portfolio Editor</h1>
       <p class="editor-intro">
-        Edit the words, add your pictures, then download one updated file.
-        <strong
-          >This is a local editing tool, not a password-protected admin
-          page.</strong
-        >
-        Nothing is sent to a server, and changes do not automatically appear on
-        a live website.
+        Edit words and pictures, then <strong>Save draft</strong> in this
+        browser. Use <strong>Publish to website</strong> with your GitHub token
+        to update the public site. The editor is public; GitHub permissions
+        protect publishing, not a hidden admin password.
       </p>
       <ol class="editor-steps">
         <li><span>1</span> Choose a chapter</li>
         <li><span>2</span> Edit text & pictures</li>
-        <li><span>3</span> Export & replace content.js</li>
+        <li><span>3</span> Save draft or publish</li>
       </ol>
       <div class="editor-toolbar">
         <button id="text-tab" class="button" aria-pressed="true">
           Text & links</button
         ><button id="picture-tab" class="button" aria-pressed="false">
           Pictures</button
-        ><button id="export" class="button primary">Export content.js</button
+        ><button id="save-draft" class="button primary">Save draft</button
+        ><button id="export" class="button">Export content.js</button
         ><button id="preview" class="button">Preview changes</button>
       </div>
       <p id="editor-status" role="status" aria-live="polite">
-        Ready. Export your changes before closing this tab.
+        Opening your saved browser draft…
       </p>
       <div id="text-panel">
         <label for="chapter-choice">Choose a chapter</label
@@ -63,8 +61,9 @@
         <p>
           To continue a previous editing session, select the
           <code>content.js</code> you exported. Imports only read JSON data;
-          uploaded JavaScript is never executed. Your current edits stay in this
-          tab until you export them. Always keep a backup.
+          uploaded JavaScript is never executed. Save draft keeps edits on this
+          device; export keeps a portable backup. Browser data can be cleared,
+          and other people using this browser profile can see your draft.
         </p>
         <label for="import-file">Import content.js</label
         ><input id="import-file" type="file" accept=".js,.json" /><button
@@ -78,6 +77,56 @@
           editor opened; it does not change files on your computer.
         </p>
       </section>
+      <section class="export-help" id="publishing">
+        <h2>Publish to your public website</h2>
+        <p>
+          Save draft keeps a local copy only. Publishing replaces
+          <strong>content.js on Sasiru382/teacher-portfolio, branch main</strong
+          >. It sends your text and embedded photos to GitHub. New local
+          assets/PDFs must be uploaded separately.
+        </p>
+        <p>
+          Sign into GitHub in a separate tab. Your GitHub account must have
+          write access to this repository. Create a short-lived fine-grained
+          personal access token restricted to this one repository with
+          <strong>Contents: read and write</strong>. No workflow write
+          permission is needed. GitHub currently does not support fine-grained
+          tokens for outside/repository collaborators: an invitation alone is
+          not enough for this token workflow. The repository owner can publish
+          with their own token, or a developer can configure a teacher-owned
+          fork. Never share the owner's token.
+          <a href="guide.html#github-publish"
+            >Step-by-step setup and collaborator instructions</a
+          >.
+        </p>
+        <label for="github-token">GitHub token</label>
+        <input
+          id="github-token"
+          type="password"
+          autocomplete="off"
+          spellcheck="false"
+          autocapitalize="none"
+          aria-describedby="token-help"
+        />
+        <p id="token-help">
+          Used only for this action, never saved or exported. Cleared after each
+          attempt. Never enter a token into a text/content field. Only publish
+          from your trusted site and browser.
+        </p>
+        <button id="publish" class="button primary" disabled>
+          Publish to website
+        </button>
+        <button id="reload-remote" class="button">Reload remote content</button>
+        <p id="publish-status" aria-live="polite">
+          Checking the repository version…
+        </p>
+        <a
+          href="https://github.com/Sasiru382/teacher-portfolio/actions"
+          target="_blank"
+          rel="noopener"
+          >Check deployment in GitHub Actions ↗</a
+        >
+      </section>
       <section class="export-help">
         <h2>After exporting</h2>
         <p>
@@ -88,7 +137,7 @@
           again. <a href="guide.html#publish">See publishing instructions.</a>
         </p>
         <p>
-          The preview is only for this session. If your browser blocks local
+          The preview is temporary, not a save. If your browser blocks local
           preview storage, export and replace the file instead.
         </p>
       </section>
