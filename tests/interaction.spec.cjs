@@ -19,6 +19,12 @@ test("every local lesson and evidence resource exists, contains real printable c
       });
   }
   walk(c.window.PORTFOLIO_CONTENT);
+  links.push(
+    ...fs
+      .readdirSync(path.join(base, "resources"))
+      .filter((f) => f.endsWith(".html"))
+      .map((f) => "resources/" + f),
+  );
   for (const href of [...new Set(links)]) {
     expect(fs.existsSync(path.join(base, href)), href).toBeTruthy();
     await page.goto(pathToFileURL(path.join(base, href)).href);
@@ -73,7 +79,20 @@ test("mobile drawer traps focus, closes with Escape, and all chapters fit withou
 test("gallery modal is labelled, restores focus and closes using Escape or backdrop", async ({
   page,
 }) => {
-  await page.goto(url + "#teaching-in-action");
+  await page.goto(url);
+  await page.evaluate(() => {
+    const data = structuredClone(window.PORTFOLIO_CONTENT);
+    data.pages.find((p) => p.id === "teaching-in-action").gallery = [
+      {
+        src: "assets/lesson.svg",
+        alt: "Test illustration",
+        caption: "Lesson in progress",
+        detail: "Test modal",
+      },
+    ];
+    sessionStorage.setItem("teacher-portfolio-preview", JSON.stringify(data));
+  });
+  await page.goto(url + "?preview=1#teaching-in-action");
   const b = page.getByRole("button", { name: "Enlarge Lesson in progress" });
   await b.click();
   await expect(page.getByRole("dialog")).toBeVisible();

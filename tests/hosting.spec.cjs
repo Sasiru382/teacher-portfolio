@@ -50,7 +50,7 @@ test("static hosting uses only local runtime assets and honours direct deep link
     if (!r.url().startsWith(origin)) remote.push(r.url());
   });
   await page.goto(origin + "/index.html#lesson-plans");
-  await expect(page.locator("h1")).toHaveText("Selected Lesson Plans");
+  await expect(page.locator("h1")).toHaveText("Weekly Lesson Plans");
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(() => {
     PORTFOLIO_CONTENT.site.email = "teacher@example.com";

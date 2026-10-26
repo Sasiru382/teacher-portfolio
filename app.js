@@ -1,5 +1,5 @@
 /* A static renderer: no fetch, framework, service worker or build step. */
-(() => {
+(async () => {
   "use strict";
   let data = window.PORTFOLIO_CONTENT;
   // The editor can open a session-only preview. Never replace exported content automatically.
@@ -7,9 +7,16 @@
     try {
       const draft = sessionStorage.getItem("teacher-portfolio-preview");
       if (draft) data = JSON.parse(draft);
+      else data = (await PortfolioAssets.previewStore("readonly")) || data;
     } catch (_) {
       /* file URL storage may be unavailable */
     }
+  }
+  try {
+    if (data !== window.PORTFOLIO_CONTENT)
+      data = PortfolioSchema.normalize(data, window.PORTFOLIO_CONTENT);
+  } catch (_) {
+    data = window.PORTFOLIO_CONTENT;
   }
   const $ = (s) => document.querySelector(s);
   const esc = (value) =>
@@ -24,18 +31,20 @@
           "'": "&#39;",
         })[c],
     );
+  const paragraphs = (value) =>
+    String(value)
+      .split(/\n\s*\n/)
+      .filter((s) => s.trim())
+      .map((s) => `<p>${esc(s)}</p>`)
+      .join("");
   const safeLink = (value) =>
     /^(https?:\/\/|mailto:|resources\/|assets\/)/i.test(value || "") &&
     !/[<>"\x00-\x1f]/.test(value)
       ? value
       : "";
   const image = (key, classes = "") => {
-    const i = data.images[key];
-    const src = /^(assets\/|data:image\/(png|jpeg|webp|gif);base64,)/i.test(
-      i?.src || "",
-    )
-      ? i.src
-      : "assets/portrait.svg";
+    const i = typeof key === "object" ? key : data.images[key];
+    const src = PortfolioAssets.image(i?.src) ? i.src : "assets/portrait.svg";
     return `<img class="${classes}" src="${esc(src)}" alt="${esc(i?.alt)}" loading="${key === "hero" || key === "portrait" ? "eager" : "lazy"}">`;
   };
   const paths = [
@@ -64,10 +73,12 @@
     `<section class="paper-panel ${cls}"><h2>${esc(title)}</h2>${list(items)}</section>`;
   const resource = (r) =>
     `<a class="resource-link" href="${esc(safeLink(r.href))}" target="_blank" rel="noopener">${icon(4)}<span><strong>${esc(r.title)}</strong><small>${esc(r.description)}</small></span><span aria-hidden="true">↗</span></a>`;
+  const pdfSlot = (file) =>
+    `<div class="pdf-slot"><h3>${esc(file.title)}</h3>${PortfolioAssets.pdf(file.href) ? `<a class="button" href="${esc(file.href)}" download="${esc(file.title)}.pdf">Download PDF: ${esc(file.title)}</a>` : '<p class="empty-state">PDF not added yet.</p>'}</div>`;
   const polaroid = (key, caption, modal = false, detail = "") =>
-    `<${modal ? 'button type="button"' : "figure"} class="polaroid" ${modal ? `data-image="${esc(key)}" data-caption="${esc(caption)}" data-detail="${esc(detail)}" aria-label="Enlarge ${esc(caption)}"` : ""}>${image(key)}<${modal ? "span" : "figcaption"}>${esc(caption)}</${modal ? "span" : "figcaption"}></${modal ? "button" : "figure"}>`;
+    `<${modal ? 'button type="button"' : "figure"} class="polaroid" ${modal ? `data-image="gallery-photo" data-caption="${esc(caption)}" data-detail="${esc(detail)}" aria-label="Enlarge ${esc(caption)}"` : ""}>${image(key)}<${modal ? "span" : "figcaption"}>${esc(caption)}</${modal ? "span" : "figcaption"}></${modal ? "button" : "figure"}>`;
   function home(p) {
-    return `<section class="hero"><div class="hero-copy"><p class="handwritten hero-welcome">${esc(p.eyebrow)}</p><h1>${esc(p.title)}</h1><p class="hero-subtitle">${esc(data.site.subtitle)}</p><p class="hero-intro">${esc(p.intro)}</p><p class="handwritten teacher-name">${esc(data.site.name)}</p><p class="qualification">${esc(data.site.qualification)}</p></div><div class="hero-art">${image("hero")}<span class="art-tag">${esc(data.site.displayNotes.heroImage)}</span></div><span class="hero-heart" aria-hidden="true">♡</span></section><section class="welcome-row"><div class="welcome-copy">${image("portrait", "portrait")}<div><h2>${esc(p.welcomeTitle)}</h2><p>${esc(p.welcome)}</p><p class="handwritten">${esc(p.handwritten)} <span aria-hidden="true">♡</span></p></div></div><section class="glance paper-panel"><h2>${icon(2)} ${esc(p.glanceTitle)}</h2>${facts(p.facts)}</section></section><section class="journey-row"><section class="numbers"><h2>${esc(p.metricsTitle)}</h2><div class="mini-divider" aria-hidden="true">──── ♡ ────</div><div class="metrics">${p.metrics.map(([number, label], i) => `<div><span class="metric-icon">${icon(i + 3)}</span><strong>${esc(number)}</strong><p>${esc(label)}</p></div>`).join("")}</div><p class="sample-label">${esc(data.site.displayNotes.metrics)}</p></section><div class="home-polaroids">${p.polaroids.map(([key, caption]) => polaroid(key, caption)).join("")}</div><blockquote class="home-quote"><span class="quote-mark">“</span><p>${esc(p.quote)}</p><img src="assets/botanical.svg" alt=""></blockquote></section>`;
+    return `<section class="hero"><div class="hero-copy"><p class="handwritten hero-welcome">${esc(p.eyebrow)}</p><h1>${esc(p.title)}</h1><p class="hero-subtitle">${esc(data.site.subtitle)}</p><p class="hero-intro">${esc(p.intro)}</p><p class="handwritten teacher-name">${esc(data.site.name)}</p><p class="qualification">${esc(data.site.qualification)}</p></div><div class="hero-art">${image("hero")}<span class="art-tag">${esc(data.site.displayNotes.heroImage)}</span></div><span class="hero-heart" aria-hidden="true">♡</span></section><section class="welcome-row"><div class="welcome-copy">${image("portrait", "portrait")}<div><h2>${esc(p.welcomeTitle)}</h2><p>${esc(p.welcome)}</p><p class="handwritten">${esc(p.handwritten)} <span aria-hidden="true">♡</span></p></div></div><section class="glance paper-panel"><h2>${icon(2)} ${esc(p.glanceTitle)}</h2>${data.images.schoolLogo?.src ? image("schoolLogo", "school-logo") : ""}${facts(p.facts)}</section></section><section class="journey-row"><section class="numbers"><h2>${esc(p.metricsTitle)}</h2><div class="mini-divider" aria-hidden="true">──── ♡ ────</div><div class="metrics">${p.metrics.map(([number, label], i) => `<div><span class="metric-icon">${icon(i + 3)}</span><strong>${esc(number)}</strong><p>${esc(label)}</p></div>`).join("")}</div><p class="sample-label">${esc(data.site.displayNotes.metrics)}</p></section><div class="home-polaroids">${p.polaroids.map(([key, caption]) => polaroid(key, caption)).join("")}</div><blockquote class="home-quote"><span class="quote-mark">“</span><p>${esc(p.quote)}</p><img src="assets/botanical.svg" alt=""></blockquote></section>`;
   }
   const renderers = {
     home: home,
@@ -76,23 +87,32 @@
     "my-internship": (p) =>
       `<div class="internship-top"><figure class="school-photo">${image("school")}<figcaption>${esc(data.site.displayNotes.schoolImage)}</figcaption></figure><section class="paper-panel">${facts(p.facts)}</section></div><div class="two-columns">${panel(p.responsibilitiesTitle, p.responsibilities)}${panel(p.learningTitle, p.learning)}</div>`,
     "teaching-philosophy": (p) =>
-      `<div class="philosophy"><p class="lead-copy">${esc(p.body)}</p><div class="principle-strips">${p.principles.map(([title, body], i) => `<section>${icon(i + 5)}<div><h2>${esc(title)}</h2><p>${esc(body)}</p></div></section>`).join("")}</div><p class="handwritten page-note">${esc(p.note)}</p></div>`,
+      `<div class="philosophy"><div class="lead-copy">${paragraphs(p.body)}</div><div class="principle-strips">${p.principles.map(([title, body], i) => `<section>${icon(i + 5)}<div><h2>${esc(title)}</h2><p>${esc(body)}</p></div></section>`).join("")}</div><p class="handwritten page-note">${esc(p.note)}</p></div>`,
     "lesson-plans": (p) =>
-      `<article class="lesson-sheet"><div class="lesson-heading">${icon(4)}<div><h2>${esc(p.lessonTitle)}</h2><p>${esc(p.level)}</p></div></div><div class="two-columns"><section><h3>${esc(p.objectivesTitle)}</h3>${list(p.objectives)}</section><section><h3>${esc(p.activitiesTitle)}</h3><ol class="activity-list">${p.activities.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section></div><section class="materials"><h3>${esc(p.materialsTitle)}</h3><p>${esc(p.materials)}</p></section><div class="resource-row">${p.resources.map(resource).join("")}</div><p class="sample-label">${esc(data.site.displayNotes.lessonResources)}</p></article>`,
+      `<div class="pdf-list">${p.weeks.map(pdfSlot).join("")}</div>`,
     "my-learners": (p) =>
-      `<div class="learners-top"><div class="grade-note"><h2>${esc(p.grade)}</h2><p>${esc(p.age)}</p></div>${panel(p.characteristicsTitle, p.characteristics)}</div><div class="two-columns">${panel(p.needsTitle, p.needs)}${panel(p.supportTitle, p.support)}</div><p class="handwritten page-note">${esc(p.note)}</p>`,
+      `${p.profiles.map((profile) => `<section class="paper-panel class-profile"><h2>${esc(profile.title)}</h2>${paragraphs(profile.intro)}</section>`).join("")}<div class="learners-top"><div class="grade-note"><h2>${esc(p.grade)}</h2><p>${esc(p.age)}</p></div>${panel(p.characteristicsTitle, p.characteristics)}</div><div class="two-columns">${panel(p.needsTitle, p.needs)}${panel(p.supportTitle, p.support)}</div><p class="handwritten page-note">${esc(p.note)}</p>`,
     "teaching-in-action": (p) =>
-      `<div class="gallery">${p.gallery.map((g) => polaroid(g.image, g.caption, true, g.detail)).join("")}</div><p class="sample-label">${esc(data.site.displayNotes.gallery)}</p>`,
+      `<div class="gallery">${p.gallery
+        .filter((g) => PortfolioAssets.image(g.src))
+        .map((g) => polaroid(g, g.caption, true, g.detail))
+        .join(
+          "",
+        )}</div>${!p.gallery.some((g) => PortfolioAssets.image(g.src)) ? '<p class="empty-state">No photographs added yet.</p>' : ""}<div class="video-gallery">${p.videos
+        .filter((v) => PortfolioAssets.video(v.src))
+        .map(
+          (v) =>
+            `<figure><video controls preload="metadata" src="${esc(v.src)}" aria-label="${esc(v.alt || v.caption || "Teaching video")}"></video><figcaption><strong>${esc(v.caption)}</strong><p>${esc(v.detail)}</p><p>${esc(v.alt)}</p></figcaption></figure>`,
+        )
+        .join(
+          "",
+        )}</div>${!p.videos.some((v) => PortfolioAssets.video(v.src)) ? '<p class="empty-state">No video clips added yet.</p>' : ""}<p class="sample-label">${esc(data.site.displayNotes.gallery)}</p>`,
     testimonials: (p) =>
-      `<div class="testimonials">${p.testimonials.map((t) => `<figure><span class="quote-mark">“</span><blockquote>${esc(t.quote)}</blockquote><figcaption><strong>${esc(t.author)}</strong><small>${esc(t.role)}</small></figcaption></figure>`).join("")}</div>`,
+      `<p class="privacy-warning">${esc(PortfolioAssets.privacy)}</p>${p.documents.map((section) => `<section class="document-section paper-panel"><h2>${esc(section.title)}</h2>${section.files.map(pdfSlot).join("")}</section>`).join("")}`,
     "reflective-journey": (p) =>
-      `<div class="reflection-grid">${p.sections.map((s, i) => panel(s.title, s.items, "tone-" + i)).join("")}</div><p class="handwritten page-note">${esc(p.note)}</p>${resource(p.resource)}`,
+      `<div class="reflection-grid">${p.sections.map((s, i) => panel(s.title, s.items, "tone-" + i)).join("")}</div><p class="handwritten page-note">${esc(p.note)}</p>`,
     "my-growth": (p) =>
       `<div class="growth-comparison">${panel(p.beforeTitle, p.before, "before")}${panel(p.afterTitle, p.after, "after")}</div><div class="two-columns growth-details">${panel(p.improvedTitle, p.improved)}${panel(p.futureTitle, p.future)}</div><p class="handwritten page-note">${esc(p.note)}</p>`,
-    achievements: (p) =>
-      `<div class="certificates">${p.certificates.map((c) => `<article>${polaroid(c.image, c.title, true, c.detail)}<p>${esc(c.detail)}</p>${safeLink(c.href) ? `<a class="button" href="${esc(safeLink(c.href))}" target="_blank" rel="noopener">${esc(data.site.displayNotes.documentButton)}</a>` : ""}</article>`).join("")}</div>`,
-    "evidence-hub": (p) =>
-      `<div class="evidence-grid">${p.resources.map(resource).join("")}</div><p class="handwritten page-note">${esc(p.note)}</p><p class="sample-label">${esc(data.site.displayNotes.evidence)}</p>`,
     "final-reflection": (p) =>
       `<div class="final-layout"><div>${p.paragraphs.map((s) => `<p>${esc(s)}</p>`).join("")}<blockquote class="reflection-quote"><p>${esc(p.quote)}</p></blockquote></div>${polaroid("reflection", p.caption)}</div>`,
     "contact-me": (p) =>

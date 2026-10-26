@@ -1,53 +1,64 @@
-# Verification record
+# Local correction verification
 
-## Executed successfully
+## Outcome and scope
 
-Command: `npm test`
+All requested correction slices are implemented locally. The branch remains `main` at `d9c091e`; no commit, push, publication, branch switch or GitHub-state change was performed. Existing publishing configuration remains fixed to `Sasiru382/teacher-portfolio`, `content.js`, `main`. The workflow was edited **locally only** to include the two new runtime scripts in future packaging.
 
-- **3 Node tests passed**: fourteen populated editable chapters/explicit demo identity; guide maps every picture slot and includes publication/privacy instructions; separate regular/semibold/bold local font mappings.
-- **10 Playwright Chromium tests passed**:
-  1. Automated axe WCAG 2 A/AA and WCAG 2.1 A/AA audit on all fourteen chapters plus editor and guide: no violations reported.
-  2. Editor text/image upload/export/import/reset, executable exported content structure and rejection of an uploaded script payload.
-  3. Temporary local static HTTP hosting, direct deep link, configured mailto/profile links and no remote runtime asset requests.
-  4. Temporary unsaved preview reflects edited text; ordinary portfolio remains unchanged.
-  5. All eight unique local printable resources exist and open offline with actual content and Print / Save as PDF controls.
-  6. Mobile drawer keyboard focus trap/Escape and no horizontal page overflow across all fourteen chapters at 390px and 320px.
-  7. Labelled gallery dialog, Escape/backdrop close and trigger-focus restoration.
-  8. Home quotation remains visible at 1024px.
-  9. Selecting the current chapter closes the mobile drawer and focuses main.
-  10. All fourteen sidebar links render populated pages offline, indicate current page, decode images, refresh deep links and emit no page errors, console errors or failed resource requests.
+Assumption: Home items 4 and 5 mean the fourth/fifth “My Teaching Journey in Numbers” metrics: weekly reflections and classroom experiences. The three earlier metrics and all Internship at a Glance facts remain.
 
-Last complete run output: Node `pass 3, fail 0`; Playwright `10 passed (12.4s)`.
+## Executed checks
 
-Command: `npm run screenshots`
+Final full run: `npm test`
 
-Saved and visually inspected:
-- `screenshots/home-desktop.png` (1536px viewport; full page)
-- `screenshots/home-mobile.png` (390px viewport; full page)
-- `screenshots/gallery-desktop.png`
-- `screenshots/editor-mobile.png`
+- Node: **6 passed, 0 failed** (`248.090068 ms`).
+- Playwright Chromium: **34 passed, 0 failed** after the pre-commit review fix. The additional regression exercises an accepted `resources/` image path through editor export, preview, image decoding and enlargement; rendering now uses the same shared image policy as validation.
+- Automated axe WCAG 2/2.1 A/AA checks report no violations across the twelve public chapters, editor and guide. This is not full accessibility certification.
+- All twelve public deep links work offline; images decode; no public-site console/page errors or failed resources were reported.
+- HTTP static-host preview and ordinary unchanged public content are both exercised.
+- Real one-page PDF fixture upload/download was verified byte-for-byte, along with export/import round trips. The fixture was independently read with pypdf: one page containing “TEST FIXTURE ONLY - NOT TEACHER EVIDENCE”. It is not supplied teacher evidence.
+- Six weekly PDF slots, four document sections/six slots, removal, invalid PDF signatures, oversized PDFs, unsafe imported URLs and blank-state hiding are exercised.
+- Thirty uploaded photos and three actual WebM clips were imported/exported without data loss. A clip was actually played and paused. Caption, image description/details, gallery modal/focus handling and photo/video removal are exercised.
+- Mobile tests cover all public chapters at 390/320 px, and a populated 30-photo/3-video gallery at 320 px, including video elements with a 1920px width attribute. No horizontal overflow.
+- Philosophy and Grade 6/Grade 9 profile introductions preserve blank-line paragraph divisions; literal script-like text remains escaped, with no injected script element.
+- School-logo blank state, actual upload, clearing, and rejection of unsafe local picture paths are exercised. No genuine logo is included in default content.
+- Original fourteen-chapter JSON export and actual original-format IndexedDB saved draft both migrate to twelve active chapters. Custom copy and uploaded legacy gallery photos survive; the archive round-trips.
+- Existing publishing/security tests are retained: Unicode bytes, no stored token, no anonymous write, stale-base/SHA conflicts, explicit reload, HTTP 401/403/404/409/422 errors, failed network/verification, action locking, local storage failure, persisted drafts and unchanged public content. GitHub writes in these tests are intercepted Playwright responses, not actual GitHub operations.
 
-Local font readiness inspection confirmed the weights actually used on Home loaded. Unused weights remain unloaded by the browser as expected.
+Formatting: `npx prettier --check *.html *.css *.js tests/*.cjs resources/*.html resources/*.css` — **all matched files pass**. `content.js` remains intentionally excluded so its assignment stays JSON-parseable.
 
-Command: `npm audit --omit=dev`
+Whitespace: `git diff --check` — passed.
 
-Result: `found 0 vulnerabilities`. Production has no package dependencies. Development install also reported zero vulnerabilities.
+Resource generation: `python tests/generate-resources.py` — **Created 7 genuine printable sample resources**. Verified that `resources/sample-reflection.html` was not recreated. Retained optional templates return to Home, not a retired route; they are no longer presented as active uploaded evidence.
 
-## Observed RED → GREEN cycles
+Captures: `node tests/capture-all.cjs` — **24 captures for 12 chapters**. Parsed `screenshots/all-pages/manifest.json` and verified each listed file exists and no removed chapter is listed.
 
-Tests were written and run before their implementing slices. Real initial failures included missing content.js, index.html, editor.html, resource files, guide.html and corrected weight-mapping files. Later regression tests caught a hidden Home quote at tablet widths and an active-hash selection leaving the mobile drawer open; both now pass. The automated accessibility audit caught low-contrast folder-diagram captions in the guide; the adjusted colour now passes.
+## RED → GREEN evidence
 
-## Visual audit
+Each implementation slice was preceded by a failing regression, followed by a passing run. Observed missing behavior included: 14 rather than 12 routes; absent separate class profiles; no PDF upload controls; absent Add photo control; missing migration schema; overflow from wide videos; broken empty logo preview; missing aggregate limit on fixed-image uploads; obsolete routes in capture tooling; and misleading session-only preview wording.
 
-Primary surface: Decide/Learn. The home keeps the supplied asymmetric hero/welcome/glance/metrics/polaroids/quote composition. Other chapters follow their supplied structures. Serif headlines, handwritten lavender copy, cream paper, a fixed 250px sidebar, line icons, botanical accents, thin borders and taped polaroids are deliberate reference-derived choices. Design-slop diagnostic: 0/10; no default tech gradient, glass cards, generic feature tiles, decorative accent rails, oversized fake dashboard metrics, centred SaaS stack or wrong surface. Demonstration metrics exist because the reference explicitly requests them and remain clearly labelled samples.
+A real maximum-media run exposed browser sessionStorage quota exhaustion. The implemented fallback stores large previews locally in origin/path-scoped IndexedDB; an explicit status warns that this preview cache can persist. Export/replace remains the fallback if browser storage is unavailable. A first Prettier check required a second formatting pass for the long new regression file; the final check passes.
 
-## Limits and caveats
+## Review screenshots
 
-- Automated accessibility checks are not a full accessibility certification or substitute for assistive-technology user testing.
-- Browser execution was verified in Playwright Chromium; no Safari/Firefox run was performed.
-- Local file preview can be restricted by browser session-storage policies. Export/replace/open is documented as the reliable fallback; local HTTP preview was exercised.
-- Photos other than the illustrative empty classroom are original SVG placeholders; no real teacher identity, student image, award or endorsement is implied.
-- Printable resource download uses the browser’s Print → Save as PDF function. These are actual HTML templates, not pre-made PDF binaries.
-- The editor is local-only and not an authenticated admin tool. Email uses the visitor’s mail application, not a backend form.
-- Nothing was published externally. The user’s existing Portfolio-Site repository was not accessed or modified.
-- ZIP packaging is left to the parent delivery agent. Exclude node_modules and test-results; optionally omit tests/screenshots for a small publishing bundle.
+All paths are relative to `/home/sasiru/teacher-portfolio/`:
+
+- `screenshots/corrections-home-default.png` — actual blank-logo default Home.
+- `screenshots/corrections-home-desktop.png` — migrated **test draft**, using an empty-classroom photo in the logo upload slot to prove upload; this is not a genuine logo.
+- `screenshots/corrections-gallery-mobile.png` — 30 repeated test photos and 3 short black test clips, not real teacher media.
+- `screenshots/all-pages/05-lesson-plans-desktop.png` — six weekly blank PDF rows.
+- `screenshots/all-pages/06-my-learners-mobile.png` — separate Grade 6/Grade 9 profiles and retained shared support information.
+- `screenshots/all-pages/08-testimonials-desktop.png` — four document sections, six blank PDF slots and public-privacy warning.
+- `screenshots/all-pages/manifest.json` — current desktop/mobile chapter capture list.
+
+Home, mobile populated gallery, mobile learner profiles and document sections were visually inspected. No visible overflow or broken media was found in those inspected views.
+
+## Compatibility and remaining limits
+
+- The active schema fixes twelve ordered route IDs. `final-reflection` is retained, with label/title **Reflective Summary**. Achievements/Evidence Hub are not public routes; the reflection journal link/file is removed.
+- Complete original exports/drafts migrate on JSON-only import/restore. The full original object remains in non-rendered `legacyArchive` to avoid silent data loss. Original sample gallery illustrations are not promoted to real photos. Migrated active document slots start blank, rather than guessing old HTML resources are PDFs. Saved base content is normalised for comparison; saved SHA guards remain.
+- **Non-rendered does not mean private:** legacyArchive is included in exports and would be public if deployed. Review it and remove private archived information before publication. Keep an offline original backup if removing the archive.
+- No genuine school logo, classroom photos, videos, PDF documents or endorsements were supplied. New asset/document sections are honestly blank. Test fixtures live under tests/ and are excluded from deployment packaging.
+- Public GitHub Pages cannot protect signed consent, signatures or minors. Both editor and public document page warn to keep originals private and use only authorised, properly redacted copies.
+- Per-upload limits: photos 8 MB (resized to 1600px), PDFs 5 MB, MP4/WebM clips 6 MB. Embedded draft limit: 40 MB. Base64 adds overhead; browser quotas may be lower. Larger media can use safe local assets/resources paths, but export does not copy those local files. Large previews may persist in browser IndexedDB; clear site data on shared devices.
+- Video codecs must be supported by the visitor’s browser. Native controls and descriptions/details are supplied; content owners must provide suitable speech captions/transcripts. Safari/Firefox were not exercised.
+- Live GitHub publishing and deployment were deliberately not exercised; they remain subject to explicit user approval after this report.

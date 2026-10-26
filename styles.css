@@ -1150,6 +1150,57 @@ footer p {
   color: #72548b;
   margin: 65px 0 35px;
 }
+.school-logo {
+  width: 88px;
+  max-height: 88px;
+  object-fit: contain;
+  margin: 0 0 14px;
+}
+.pdf-list,
+.video-gallery {
+  display: grid;
+  gap: 20px;
+}
+.pdf-slot {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.pdf-slot h3 {
+  margin: 0 0 10px;
+}
+.document-section,
+.class-profile {
+  margin-bottom: 24px;
+}
+.privacy-warning {
+  padding: 18px;
+  border: 1px solid var(--border);
+  background: #eee4f5;
+  color: #593970;
+}
+.video-gallery {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  margin: 26px 0;
+}
+.video-gallery figure {
+  margin: 0;
+  min-width: 0;
+}
+.video-gallery video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  background: #211a29;
+}
+.video-gallery figcaption {
+  padding: 12px 0;
+  overflow-wrap: anywhere;
+}
+.empty-state {
+  font-style: italic;
+}
 .mobile-bar,
 .menu-close {
   display: none;

@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
-test("content provides fourteen populated editable chapters and explicit demo identity", () => {
+test("content provides twelve populated editable chapters and explicit demo identity", () => {
   assert.ok(
     fs.existsSync(path.join(root, "content.js")),
     "Editable content.js must exist",
@@ -15,8 +15,8 @@ test("content provides fourteen populated editable chapters and explicit demo id
     context,
   );
   const data = context.window.PORTFOLIO_CONTENT;
-  assert.equal(data.pages.length, 14);
-  assert.equal(new Set(data.pages.map((p) => p.id)).size, 14);
+  assert.equal(data.pages.length, 12);
+  assert.equal(new Set(data.pages.map((p) => p.id)).size, 12);
   for (const p of data.pages) {
     assert.ok(p.title);
     assert.ok(p.intro);

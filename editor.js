@@ -112,7 +112,21 @@
     let counter = 0;
     function walk(obj, container, prefix = "") {
       Object.entries(obj).forEach(([key, val]) => {
-        if (key === "id" || key === "image") return;
+        if (
+          key === "id" ||
+          key === "image" ||
+          (chapter === "teaching-in-action" &&
+            ["gallery", "videos"].includes(key))
+        )
+          return;
+        if (
+          key === "href" &&
+          Object.hasOwn(obj, "title") &&
+          (chapter === "lesson-plans" || chapter === "testimonials")
+        ) {
+          pdfField(obj, container);
+          return;
+        }
         if (val && typeof val === "object") {
           const group = document.createElement("fieldset");
           const legend = document.createElement("legend");
@@ -133,7 +147,9 @@
           ? human(key)
           : `Text ${Number(key) + 1}`;
         const input = document.createElement(
-          String(val).length > 95 ? "textarea" : "input",
+          ["body", "intro"].includes(key) || String(val).length > 95
+            ? "textarea"
+            : "input",
         );
         input.id = id;
         input.value = val;
@@ -153,7 +169,247 @@
         container.append(field);
       });
     }
+    if (chapter === "testimonials") {
+      const note = document.createElement("p");
+      note.className = "privacy-warning";
+      note.textContent = PortfolioAssets.privacy;
+      area.append(note);
+    }
     walk(value, area);
+    if (chapter === "teaching-in-action") mediaFields(value, area);
+  }
+  function mediaFields(page, area) {
+    const note = document.createElement("p");
+    note.textContent =
+      PortfolioAssets.privacy +
+      " Photos: JPG/PNG/WebP up to 8 MB, resized to 1600 px. Clips: MP4/WebM up to 6 MB each. PDFs: 5 MB each. Embedded content total: 40 MB. Large media should use local assets/ paths; export does not copy local files. Browser preview/storage may have lower quotas.";
+    area.append(note);
+    [
+      ["gallery", "photo", 30],
+      ["videos", "video", 3],
+    ].forEach(([key, kind, max]) => {
+      const section = document.createElement("section");
+      area.append(section);
+      const heading = document.createElement("h3");
+      heading.textContent = kind === "photo" ? "Photographs" : "Video clips";
+      section.append(heading);
+      page[key].forEach((record, index) => {
+        const n = index + 1;
+        const group = document.createElement("fieldset");
+        const legend = document.createElement("legend");
+        legend.textContent = kind + " " + n;
+        group.append(legend);
+        section.append(group);
+        const field = (label, type = "text") => {
+          const id = `media-${kind}-${n}-${group.children.length}`;
+          const l = document.createElement("label");
+          l.htmlFor = id;
+          l.textContent = label;
+          const input = document.createElement(
+            type === "textarea" ? "textarea" : "input",
+          );
+          input.id = id;
+          if (type !== "textarea") input.type = type;
+          group.append(l, input);
+          return input;
+        };
+        const upload = field(`Upload ${kind} ${n}`, "file");
+        upload.accept =
+          kind === "photo"
+            ? "image/jpeg,image/png,image/webp"
+            : "video/mp4,video/webm";
+        const state = document.createElement("p");
+        state.textContent = record.src ? "Media added" : "No file added";
+        group.append(state);
+        upload.addEventListener("change", async () => {
+          const f = upload.files[0];
+          if (!f || busy || processing) return;
+          const types =
+            kind === "photo"
+              ? ["image/jpeg", "image/png", "image/webp"]
+              : ["video/mp4", "video/webm"];
+          if (
+            !types.includes(f.type) ||
+            f.size > (kind === "photo" ? 8 : 6) * 1024 * 1024
+          ) {
+            status(
+              "Unsupported file or too large: photos up to 8 MB; MP4/WebM clips up to 6 MB.",
+            );
+            return;
+          }
+          const previous = record.src;
+          processing++;
+          $("#publish").disabled = true;
+          try {
+            if (kind === "photo") {
+              const bitmap = await createImageBitmap(f);
+              const scale = Math.min(
+                1,
+                1600 / Math.max(bitmap.width, bitmap.height),
+              );
+              const canvas = document.createElement("canvas");
+              canvas.width = Math.round(bitmap.width * scale);
+              canvas.height = Math.round(bitmap.height * scale);
+              canvas
+                .getContext("2d")
+                .drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+              bitmap.close();
+              record.src = canvas.toDataURL(
+                f.type === "image/png" ? "image/png" : "image/jpeg",
+                0.88,
+              );
+            } else record.src = await readFile(f);
+            if (JSON.stringify(draft).length > PortfolioAssets.maxContent)
+              throw Error("40 MB total exceeded. Use local files.");
+            state.textContent = "Media added";
+            changed();
+            status("Media embedded in draft. Save or export to keep it.");
+          } catch (error) {
+            record.src = previous;
+            status("Media could not be added. " + error.message);
+          } finally {
+            processing--;
+            $("#publish").disabled = busy || !ready;
+            upload.value = "";
+          }
+        });
+        [
+          ["caption", `Caption for ${kind} ${n}`],
+          [
+            "alt",
+            `${kind === "photo" ? "Image" : "Video"} description for ${kind} ${n}`,
+          ],
+          ["detail", `Details for ${kind} ${n}`],
+        ].forEach(([key, label]) => {
+          const input = field(label, key === "detail" ? "textarea" : "text");
+          input.value = record[key];
+          input.addEventListener("input", () => {
+            record[key] = input.value;
+            changed();
+          });
+        });
+        const path = field(`Local path for ${kind} ${n}`);
+        path.value = record.src.startsWith("data:") ? "" : record.src;
+        path.placeholder =
+          kind === "photo" ? "assets/photo.jpg" : "assets/clip.webm";
+        path.addEventListener("change", () => {
+          if (
+            !path.value ||
+            PortfolioAssets[kind === "photo" ? "image" : "video"](path.value)
+          ) {
+            record.src = path.value;
+            state.textContent = record.src ? "Media added" : "No file added";
+            changed();
+          } else status("Choose a safe local assets/ media path.");
+        });
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = `Remove ${kind} ${n}`;
+        remove.addEventListener("click", () => {
+          if (busy || processing) return;
+          page[key].splice(index, 1);
+          changed();
+          renderFields();
+        });
+        group.append(remove);
+      });
+      const add = document.createElement("button");
+      add.type = "button";
+      add.textContent = kind === "photo" ? "Add photo" : "Add video clip";
+      add.disabled = page[key].length >= max;
+      add.addEventListener("click", () => {
+        if (busy || processing || page[key].length >= max) return;
+        page[key].push({ src: "", alt: "", caption: "", detail: "" });
+        changed();
+        renderFields();
+      });
+      section.append(add);
+    });
+  }
+  function readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(Error("File could not be read"));
+      reader.readAsDataURL(file);
+    });
+  }
+  function pdfField(file, container) {
+    const group = document.createElement("div");
+    group.className = "edit-field";
+    const id =
+      "pdf-" +
+      document.querySelectorAll('input[type="file"][accept="application/pdf"]')
+        .length;
+    const label = document.createElement("label");
+    label.htmlFor = id;
+    label.textContent = "Upload PDF for " + file.title;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.id = id;
+    input.accept = "application/pdf";
+    const state = document.createElement("p");
+    state.textContent = file.href ? "PDF added" : "PDF not added yet";
+    input.addEventListener("change", async () => {
+      const f = input.files[0];
+      if (!f || busy || processing) return;
+      if (f.type !== "application/pdf" || f.size > 5 * 1024 * 1024) {
+        status("Choose a PDF smaller than 5 MB.");
+        return;
+      }
+      processing++;
+      $("#publish").disabled = true;
+      const previous = file.href;
+      try {
+        if (!(await f.slice(0, 5).text()).startsWith("%PDF-"))
+          throw Error("Not a PDF");
+        file.href = await readFile(f);
+        if (JSON.stringify(draft).length > PortfolioAssets.maxContent)
+          throw Error(
+            "Portfolio exceeds 40 MB total. Use local files instead.",
+          );
+        state.textContent = "PDF added";
+        changed();
+        status(
+          "PDF embedded in draft. Save draft or export content.js; the website has not changed.",
+        );
+      } catch (error) {
+        file.href = previous;
+        status("PDF could not be added. " + error.message);
+      } finally {
+        processing--;
+        $("#publish").disabled = busy || !ready;
+        input.value = "";
+      }
+    });
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Remove PDF for " + file.title;
+    remove.addEventListener("click", () => {
+      if (busy || processing) return;
+      file.href = "";
+      state.textContent = "PDF not added yet";
+      changed();
+    });
+    const pathLabel = document.createElement("label");
+    pathLabel.htmlFor = id + "-path";
+    pathLabel.textContent = "Local PDF path for " + file.title;
+    const path = document.createElement("input");
+    path.id = id + "-path";
+    path.value = file.href.startsWith("data:") ? "" : file.href;
+    path.placeholder = "resources/your-file.pdf";
+    path.addEventListener("change", () => {
+      if (!path.value || PortfolioAssets.pdf(path.value)) {
+        file.href = path.value;
+        state.textContent = file.href ? "PDF added" : "PDF not added yet";
+        changed();
+      } else
+        status(
+          "Use a safe resources/ or assets/ PDF path. Copy the file into that folder too.",
+        );
+    });
+    group.append(label, input, state, remove, pathLabel, path);
+    container.append(group);
   }
   function choices() {
     const previous = $("#chapter-choice").value;
@@ -177,7 +433,8 @@
       const card = document.createElement("section");
       card.className = "picture-card";
       const img = document.createElement("img");
-      img.src = slot.src;
+      if (slot.src) img.src = slot.src;
+      else img.hidden = true;
       img.alt = slot.alt;
       const fields = document.createElement("div");
       const h = document.createElement("h3");
@@ -211,6 +468,7 @@
         processing++;
         $("#publish").disabled = true;
         status("Processing picture… wait before saving or publishing.");
+        const previous = slot.src;
         try {
           const bitmap = await createImageBitmap(f);
           const scale = Math.min(
@@ -228,13 +486,18 @@
             f.type === "image/png" ? "image/png" : "image/jpeg",
             0.88,
           );
+          if (JSON.stringify(draft).length > PortfolioAssets.maxContent)
+            throw Error("40 MB total exceeded. Use local files.");
           img.src = slot.src;
+          img.hidden = false;
           source.textContent =
             "Slot: " + key + " · Uploaded picture embedded in export";
           changed();
-        } catch (_) {
+        } catch (error) {
+          slot.src = previous;
           status(
-            "This picture could not be read. Try a different JPG, PNG or WebP file.",
+            "This picture could not be added. Try a JPG, PNG or WebP file; keep embedded content below 40 MB. " +
+              error.message,
           );
         } finally {
           processing--;
@@ -264,14 +527,24 @@
       path.value = slot.src.startsWith("data:") ? "" : slot.src;
       path.placeholder = "assets/my-photo.jpg";
       path.addEventListener("change", () => {
-        if (!path.value.startsWith("assets/")) {
+        if (
+          path.value &&
+          (!path.value.startsWith("assets/") ||
+            !PortfolioAssets.image(path.value))
+        ) {
           status(
-            "Local image paths must start with assets/. Copy the picture into that folder too.",
+            "Use a safe assets/ image path without traversal. Copy the picture into that folder too.",
           );
           return;
         }
         slot.src = path.value;
-        img.src = slot.src;
+        if (slot.src) {
+          img.src = slot.src;
+          img.hidden = false;
+        } else {
+          img.removeAttribute("src");
+          img.hidden = true;
+        }
         source.textContent = "Slot: " + key + " · " + slot.src;
         changed();
       });
@@ -323,44 +596,19 @@
         /^\s*window\.PORTFOLIO_CONTENT\s*=\s*([\s\S]+?)\s*;?\s*$/,
       );
       const imported = JSON.parse(match ? match[1] : stripped);
-      if (
-        !imported.site ||
-        !imported.images ||
-        !Array.isArray(imported.pages) ||
-        imported.pages.length !== 14 ||
-        JSON.stringify(imported.pages.map((p) => p.id)) !==
-          JSON.stringify(draft.pages.map((p) => p.id))
-      )
-        throw Error("schema");
-      // Check the full shape, so missing properties cannot break the renderer.
-      const shape = (base, value) => {
-        if (base === null || typeof base !== "object")
-          return typeof value === typeof base;
-        if (Array.isArray(base))
-          return (
-            Array.isArray(value) &&
-            value.length === base.length &&
-            base.every((x, i) => shape(x, value[i]))
-          );
-        return (
-          value &&
-          Object.keys(base).every(
-            (k) => Object.hasOwn(value, k) && shape(base[k], value[k]),
-          )
-        );
-      };
-      if (!shape(JSON.parse(original), imported)) throw Error("shape");
-      draft = imported;
+      draft = PortfolioSchema.normalize(imported, JSON.parse(original));
       dirty = true;
       choices();
       renderFields();
       pictureFields();
       status(
-        "Imported your content. Review it, then Save draft, export a backup, or publish.",
+        draft.legacyArchive
+          ? "Imported and migrated legacy content to twelve chapters. Original data preserved in legacyArchive in exports: review archived private content before publishing."
+          : "Imported your content. Review it, then Save draft, export a backup, or publish.",
       );
     } catch (_) {
       status(
-        "Your file could not be imported. Choose a content.js exported by this editor; it must contain all fourteen chapters. No uploaded code was executed.",
+        "Your file could not be imported. Choose a content.js exported by this editor; it must contain all twelve chapters. No uploaded code was executed.",
       );
     }
     e.target.value = "";
@@ -385,15 +633,24 @@
       "Reset to the loaded content. No files on your computer were changed.",
     );
   });
-  $("#preview").addEventListener("click", () => {
+  $("#preview").addEventListener("click", async () => {
+    if (processing || busy) {
+      status("Wait for file processing to finish.");
+      return;
+    }
     try {
-      sessionStorage.setItem(
-        "teacher-portfolio-preview",
-        JSON.stringify(draft),
-      );
+      try {
+        sessionStorage.setItem(
+          "teacher-portfolio-preview",
+          JSON.stringify(draft),
+        );
+      } catch (_) {
+        sessionStorage.removeItem("teacher-portfolio-preview");
+        await PortfolioAssets.previewStore("readwrite", draft);
+      }
       window.open("index.html?preview=1#home", "_blank");
       status(
-        "Preview opened. It is temporary; Save draft keeps edits locally, Publish updates the website.",
+        "Preview opened; the public website is unchanged. A large draft may remain in this browser’s local preview cache. Save draft or export to keep a deliberate backup; clear site data on shared devices.",
       );
     } catch (_) {
       status(
@@ -415,30 +672,7 @@
       /^\s*window\.PORTFOLIO_CONTENT\s*=\s*([\s\S]+?)\s*;?\s*$/,
     );
     const value = JSON.parse(match ? match[1] : stripped);
-    function shape(base, item) {
-      if (!base || typeof base !== "object") return typeof base === typeof item;
-      if (Array.isArray(base))
-        return (
-          Array.isArray(item) &&
-          base.length === item.length &&
-          base.every((v, i) => shape(v, item[i]))
-        );
-      return (
-        item &&
-        Object.keys(base).every(
-          (k) => Object.hasOwn(item, k) && shape(base[k], item[k]),
-        )
-      );
-    }
-    if (
-      !shape(JSON.parse(original), value) ||
-      JSON.stringify(value.pages.map((p) => p.id)) !==
-        JSON.stringify(JSON.parse(original).pages.map((p) => p.id))
-    )
-      throw Error(
-        "Remote content has an incompatible format. Export your draft and ask the owner for help.",
-      );
-    return value;
+    return PortfolioSchema.normalize(value, JSON.parse(original));
   }
   const serialize = () =>
     "/* Portfolio content. */\nwindow.PORTFOLIO_CONTENT = " +
@@ -649,9 +883,13 @@
         draft = parseContent(JSON.stringify(saved.content));
         if (typeof saved.baseContent !== "string")
           throw Error("Invalid saved base");
-        baseContent = saved.baseContent;
+        baseContent = JSON.stringify(parseContent(saved.baseContent));
         baseSha = saved.baseSha;
-        status("Saved draft restored from this browser. Not published.");
+        status(
+          draft.legacyArchive
+            ? "Saved legacy draft restored and migrated. Original data retained in legacyArchive; review privacy before publishing. Not published."
+            : "Saved draft restored from this browser. Not published.",
+        );
       } else status("Ready. Save draft keeps edits in this browser only.");
     } catch (_) {
       status(

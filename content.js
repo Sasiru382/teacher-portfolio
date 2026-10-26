@@ -1,4 +1,4 @@
-/* All portfolio copy, image slots and resource links live here. Use editor.html to edit. */
+/* Editable portfolio content. */
 window.PORTFOLIO_CONTENT = {
   "site": {
     "name": "Your Name",
@@ -17,7 +17,7 @@ window.PORTFOLIO_CONTENT = {
       "metrics": "Illustrative numbers · replace with verified totals",
       "schoolImage": "Illustrative school · replace with your placement",
       "lessonResources": "Resources open in a new tab. Use your browser’s Print → Save as PDF to download.",
-      "gallery": "Illustrative images only · Select a picture to enlarge it.",
+      "gallery": "Select a photo to enlarge it. Videos have playback controls. Share only authorised, privacy-reviewed media.",
       "evidence": "All links open genuine printable sample resources in a new tab. Replace templates with your own evidence before publishing.",
       "documentButton": "View document ↗"
     }
@@ -48,70 +48,15 @@ window.PORTFOLIO_CONTENT = {
       "alt": "Illustrative classroom poster reading Be kind, be curious, be yourself",
       "label": "Home polaroid · Classroom values"
     },
-    "gallery1": {
-      "src": "assets/lesson.svg",
-      "alt": "Illustrative lesson in progress",
-      "label": "Teaching in Action · Lesson in progress"
-    },
-    "gallery2": {
-      "src": "assets/group.svg",
-      "alt": "Illustrative group-work table with learning cards",
-      "label": "Teaching in Action · Group activity"
-    },
-    "gallery3": {
-      "src": "assets/materials.svg",
-      "alt": "Illustrative books, worksheets and pencils",
-      "label": "Teaching in Action · Teaching materials"
-    },
-    "gallery4": {
-      "src": "assets/board.svg",
-      "alt": "Illustrative chalkboard with English vocabulary",
-      "label": "Teaching in Action · Board work"
-    },
-    "gallery5": {
-      "src": "assets/workshop.svg",
-      "alt": "Illustrative professional-learning workspace",
-      "label": "Teaching in Action · Workshop"
-    },
-    "gallery6": {
-      "src": "assets/event.svg",
-      "alt": "Illustrative school event decorations",
-      "label": "Teaching in Action · School event"
-    },
-    "certificate1": {
-      "src": "assets/certificate-1.svg",
-      "alt": "Sample certificate placeholder, not an awarded credential",
-      "label": "Achievements · Language teaching workshop"
-    },
-    "certificate2": {
-      "src": "assets/certificate-2.svg",
-      "alt": "Sample certificate placeholder, not an awarded credential",
-      "label": "Achievements · Classroom management"
-    },
-    "certificate3": {
-      "src": "assets/certificate-3.svg",
-      "alt": "Sample certificate placeholder, not an awarded credential",
-      "label": "Achievements · Inclusive teaching"
-    },
-    "certificate4": {
-      "src": "assets/certificate-4.svg",
-      "alt": "Sample certificate placeholder, not an awarded credential",
-      "label": "Achievements · English language day"
-    },
-    "certificate5": {
-      "src": "assets/certificate-5.svg",
-      "alt": "Sample certificate placeholder, not an awarded credential",
-      "label": "Achievements · Teaching support"
-    },
-    "certificate6": {
-      "src": "assets/certificate-6.svg",
-      "alt": "Sample certificate placeholder, not an awarded credential",
-      "label": "Achievements · Continuing development"
-    },
     "reflection": {
       "src": "assets/reflection.svg",
       "alt": "Illustrative open reflection journal and flowers",
-      "label": "Final Reflection · Journal polaroid"
+      "label": "Reflective Summary · Journal polaroid"
+    },
+    "schoolLogo": {
+      "src": "",
+      "alt": "School logo",
+      "label": "School logo · Internship at a Glance"
     }
   },
   "pages": [
@@ -160,14 +105,6 @@ window.PORTFOLIO_CONTENT = {
         [
           "20+",
           "Sample activities & worksheets"
-        ],
-        [
-          "6",
-          "Sample weekly reflections"
-        ],
-        [
-          "5+",
-          "Sample classroom experiences"
         ]
       ],
       "polaroids": [
@@ -306,37 +243,33 @@ window.PORTFOLIO_CONTENT = {
     {
       "id": "lesson-plans",
       "label": "Lesson Plans",
-      "title": "Selected Lesson Plans",
+      "title": "Weekly Lesson Plans",
       "eyebrow": "Purposeful plans, meaningful learning",
-      "intro": "An editable sample lesson with practical, printable resources.",
-      "lessonTitle": "Action Verbs · A sample English lesson",
-      "level": "Sample level: upper primary / early secondary · 40 minutes",
-      "objectivesTitle": "Learning Objectives",
-      "objectives": [
-        "Identify and use action verbs in context.",
-        "Practise speaking and listening through simple movement prompts.",
-        "Build confidence by creating sentences with familiar vocabulary."
-      ],
-      "activitiesTitle": "Key Activities",
-      "activities": [
-        "Warm-up · Picture discussion and vocabulary recall (5 minutes)",
-        "Explore · Match action cards to words (8 minutes)",
-        "Practise · Pair-work mime and describe activity (12 minutes)",
-        "Create · Write and share three original sentences (10 minutes)",
-        "Reflect · Exit ticket: one new verb and one question (5 minutes)"
-      ],
-      "materialsTitle": "Materials",
-      "materials": "Picture cards, a board, pencils and the printable worksheet. Offer a seated alternative to movement activities and larger-print copies where needed.",
-      "resources": [
+      "intro": "Six weeks of lesson plans. Download the teacher’s PDF when it has been added.",
+      "weeks": [
         {
-          "title": "Sample lesson plan",
-          "description": "Printable objectives, timing and assessment notes",
-          "href": "resources/sample-lesson.html"
+          "title": "Week 01",
+          "href": ""
         },
         {
-          "title": "Action verbs worksheet",
-          "description": "A genuine editable, printable classroom activity",
-          "href": "resources/sample-worksheet.html"
+          "title": "Week 02",
+          "href": ""
+        },
+        {
+          "title": "Week 03",
+          "href": ""
+        },
+        {
+          "title": "Week 04",
+          "href": ""
+        },
+        {
+          "title": "Week 05",
+          "href": ""
+        },
+        {
+          "title": "Week 06",
+          "href": ""
         }
       ]
     },
@@ -369,68 +302,77 @@ window.PORTFOLIO_CONTENT = {
         "Provide individual feedback with one next step",
         "Encourage peer support and flexible grouping"
       ],
-      "note": "Different needs. Different stories. The same right to be heard."
+      "note": "Different needs. Different stories. The same right to be heard.",
+      "profiles": [
+        {
+          "title": "Grade 6 Class Profile",
+          "intro": "Add an anonymised introduction to this class. Use blank lines to divide paragraphs."
+        },
+        {
+          "title": "Grade 9 Class Profile",
+          "intro": "Add an anonymised introduction to this class. Use blank lines to divide paragraphs."
+        }
+      ]
     },
     {
       "id": "teaching-in-action",
       "label": "Teaching in Action",
       "title": "In the Classroom & Beyond",
       "eyebrow": "Little moments, lasting learning",
-      "intro": "Six illustrative image slots. Replace only with photographs you have permission to share.",
-      "gallery": [
-        {
-          "image": "gallery1",
-          "caption": "Lesson in progress",
-          "detail": "Sample caption: introducing vocabulary through a shared picture discussion."
-        },
-        {
-          "image": "gallery2",
-          "caption": "Group activity",
-          "detail": "Sample caption: learners collaborate, rehearse and explain their choices."
-        },
-        {
-          "image": "gallery3",
-          "caption": "Teaching materials",
-          "detail": "Sample caption: simple resources that make a task easier to understand."
-        },
-        {
-          "image": "gallery4",
-          "caption": "Board work",
-          "detail": "Sample caption: visual organisation of new words and sentence patterns."
-        },
-        {
-          "image": "gallery5",
-          "caption": "Workshop",
-          "detail": "Sample caption: reflecting with colleagues and exploring new approaches."
-        },
-        {
-          "image": "gallery6",
-          "caption": "School event",
-          "detail": "Sample caption: learning and belonging beyond the classroom."
-        }
-      ]
+      "intro": "Up to 30 photographs and 3 short video clips, shared only with permission. No media has been supplied yet.",
+      "gallery": [],
+      "videos": []
     },
     {
       "id": "testimonials",
       "label": "Testimonials",
-      "title": "Words That Inspire",
+      "title": "Internship Documents",
       "eyebrow": "Feedback that helps me grow",
-      "intro": "These are sample quotations, not real endorsements. Replace with approved feedback or remove them.",
-      "testimonials": [
+      "intro": "Observation, consent and internship records. Only authorised, redacted copies belong on a public portfolio.",
+      "documents": [
         {
-          "quote": "The lesson had a clear purpose, and the activities gave learners time to practise before sharing.",
-          "author": "Sample mentor feedback",
-          "role": "Illustrative quotation — permission required"
+          "title": "Classroom observation forms",
+          "files": [
+            {
+              "title": "Observation form 1",
+              "href": ""
+            },
+            {
+              "title": "Observation form 2",
+              "href": ""
+            }
+          ]
         },
         {
-          "quote": "The pictures and examples helped me understand the new words and feel ready to speak.",
-          "author": "Sample learner feedback",
-          "role": "Illustrative quotation — anonymise learner identity"
+          "title": "Signed consent of principal and teacher",
+          "files": [
+            {
+              "title": "Principal consent",
+              "href": ""
+            },
+            {
+              "title": "Teacher consent",
+              "href": ""
+            }
+          ]
         },
         {
-          "quote": "A thoughtful reflection identifies both a strength and a practical next step for the following lesson.",
-          "author": "Sample supervisor feedback",
-          "role": "Illustrative quotation — not an endorsement"
+          "title": "Timetable",
+          "files": [
+            {
+              "title": "Timetable",
+              "href": ""
+            }
+          ]
+        },
+        {
+          "title": "Internship completion letter",
+          "files": [
+            {
+              "title": "Internship completion letter",
+              "href": ""
+            }
+          ]
         }
       ]
     },
@@ -478,12 +420,7 @@ window.PORTFOLIO_CONTENT = {
           ]
         }
       ],
-      "note": "Every challenge taught me something valuable.",
-      "resource": {
-        "title": "Sample reflection journal",
-        "description": "Printable prompts for your own reflective notes",
-        "href": "resources/sample-reflection.html"
-      }
+      "note": "Every challenge taught me something valuable."
     },
     {
       "id": "my-growth",
@@ -522,104 +459,9 @@ window.PORTFOLIO_CONTENT = {
       "note": "Small steps today. A more thoughtful teacher tomorrow."
     },
     {
-      "id": "achievements",
-      "label": "Achievements",
-      "title": "My Achievements",
-      "eyebrow": "A place for milestones",
-      "intro": "Six clearly marked sample certificate slots. No qualifications or awards are claimed here.",
-      "certificates": [
-        {
-          "image": "certificate1",
-          "title": "Language Teaching Workshop",
-          "detail": "Sample certificate · Replace with verified workshop details",
-          "href": ""
-        },
-        {
-          "image": "certificate2",
-          "title": "Classroom Management",
-          "detail": "Sample certificate · Add issuer and date",
-          "href": ""
-        },
-        {
-          "image": "certificate3",
-          "title": "Inclusive Teaching",
-          "detail": "Sample certificate · Add approved evidence",
-          "href": ""
-        },
-        {
-          "image": "certificate4",
-          "title": "English Language Day",
-          "detail": "Sample certificate · Replace or remove",
-          "href": ""
-        },
-        {
-          "image": "certificate5",
-          "title": "Teaching Support",
-          "detail": "Sample certificate · Add your real contribution",
-          "href": ""
-        },
-        {
-          "image": "certificate6",
-          "title": "Continuing Development",
-          "detail": "Sample certificate · Add verified learning",
-          "href": ""
-        }
-      ]
-    },
-    {
-      "id": "evidence-hub",
-      "label": "Evidence Hub",
-      "title": "Supporting Evidence",
-      "eyebrow": "The practice behind the story",
-      "intro": "Eight sample evidence categories with real printable templates. Replace them with your own redacted documents.",
-      "resources": [
-        {
-          "title": "Lesson Plans",
-          "description": "A structured, printable sample lesson plan",
-          "href": "resources/sample-lesson.html"
-        },
-        {
-          "title": "Worksheets",
-          "description": "An action-verb practice worksheet",
-          "href": "resources/sample-worksheet.html"
-        },
-        {
-          "title": "Assessments",
-          "description": "A simple assessment and feedback template",
-          "href": "resources/sample-assessment.html"
-        },
-        {
-          "title": "Photographs",
-          "description": "A consent and image-record template",
-          "href": "resources/sample-photo-record.html"
-        },
-        {
-          "title": "Observation Sheets",
-          "description": "A guided classroom observation template",
-          "href": "resources/sample-observation.html"
-        },
-        {
-          "title": "Teaching Materials",
-          "description": "Printable action-verb prompt cards",
-          "href": "resources/sample-materials.html"
-        },
-        {
-          "title": "Reflection Logs",
-          "description": "A guided reflection journal page",
-          "href": "resources/sample-reflection.html"
-        },
-        {
-          "title": "Other Evidence",
-          "description": "An evidence index with privacy checks",
-          "href": "resources/sample-evidence-index.html"
-        }
-      ],
-      "note": "Evidence of learning. Evidence of growth."
-    },
-    {
       "id": "final-reflection",
-      "label": "Final Reflection",
-      "title": "Looking Back, Moving Forward",
+      "label": "Reflective Summary",
+      "title": "Reflective Summary",
       "eyebrow": "A journey still unfolding",
       "intro": "Teaching is a practice of learning, noticing and beginning again.",
       "paragraphs": [
