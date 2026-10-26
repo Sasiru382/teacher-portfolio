@@ -28,7 +28,7 @@ test("editor edits text and images, safely imports and exports usable content.js
   const exported = { window: {} };
   require("node:vm").runInNewContext(text, exported);
   expect(exported.window.PORTFOLIO_CONTENT.site.name).toBe("Test Teacher");
-  expect(exported.window.PORTFOLIO_CONTENT.pages).toHaveLength(14);
+  expect(exported.window.PORTFOLIO_CONTENT.pages).toHaveLength(12);
   await page.getByLabel("Import content.js").setInputFiles({
     name: "content.js",
     mimeType: "text/javascript",

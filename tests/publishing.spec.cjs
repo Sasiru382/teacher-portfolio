@@ -114,13 +114,11 @@ test("imported edits trigger an unsaved-close warning", async ({ page }) => {
   );
   await page.goto(origin + "/editor.html");
   await expect(page.getByLabel("Teacher name", { exact: true })).toBeVisible();
-  await page
-    .getByLabel("Import content.js")
-    .setInputFiles({
-      name: "content.js",
-      mimeType: "text/javascript",
-      buffer: Buffer.from(initial.replace("Your Name", "Imported Teacher")),
-    });
+  await page.getByLabel("Import content.js").setInputFiles({
+    name: "content.js",
+    mimeType: "text/javascript",
+    buffer: Buffer.from(initial.replace("Your Name", "Imported Teacher")),
+  });
   await expect(page.locator("#editor-status")).toContainText("Imported");
   const warning = page.waitForEvent("dialog");
   const reload = page.reload();

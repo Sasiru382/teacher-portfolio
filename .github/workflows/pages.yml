@@ -35,7 +35,7 @@ jobs:
       - name: Stage only public website files
         run: |
           mkdir _site
-          cp index.html content.js app.js styles.css editor.html editor.js editor.css guide.html guide.css _site/
+          cp index.html content.js asset-policy.js schema.js app.js styles.css editor.html editor.js editor.css guide.html guide.css _site/
           cp -R assets resources _site/
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3

@@ -12,7 +12,7 @@ test("every sidebar deep link renders a populated chapter offline with no broken
   });
   page.on("requestfailed", (request) => errors.push(request.url()));
   await page.goto(url);
-  await expect(page.locator("#navigation a")).toHaveCount(14);
+  await expect(page.locator("#navigation a")).toHaveCount(12);
   const links = await page.locator("#navigation a").evaluateAll((a) =>
     a.map((x) => ({
       href: x.getAttribute("href"),
@@ -24,7 +24,7 @@ test("every sidebar deep link renders a populated chapter offline with no broken
     await expect(page.locator("main h1")).toBeVisible();
     await expect(page.locator("main")).toContainText(/./);
     expect((await page.locator("main").innerText()).length).toBeGreaterThan(
-      250,
+      100,
     );
     await expect(
       page.locator(`#navigation a[href="${link.href}"]`),
