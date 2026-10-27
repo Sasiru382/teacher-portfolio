@@ -38,20 +38,20 @@ For precise image filenames, slots, page placements, sizes, caption edits, certi
 
 ## All twelve pages
 
-| Chapter | Deep link | Composition |
-| --- | --- | --- |
-| Home | `index.html#home` | Classroom hero, portrait welcome, internship glance, three sample metrics, two polaroids, quote |
-| About Me | `index.html#about-me` | Biography, timeline, portrait, strengths sticky note, hobbies |
-| My Internship | `index.html#my-internship` | School image, facts, responsibilities, learning |
-| Teaching Philosophy | `index.html#teaching-philosophy` | Intro and four principle strips |
-| Lesson Plans | `index.html#lesson-plans` | Week 01–06, one uploadable/downloadable PDF each |
-| My Learners | `index.html#my-learners` | Separate Grade 6/Grade 9 profiles with multi-paragraph introductions, characteristics, needs and support |
-| Teaching in Action | `index.html#teaching-in-action` | Up to 30 photos and 3 playable video clips; captions/descriptions/details and accessible image viewer |
-| Testimonials | `index.html#testimonials` | Four PDF sections: observations (2), principal/teacher consent (2), timetable (1), completion letter (1) |
-| Reflective Journey | `index.html#reflective-journey` | Four reflection panels; no sample journal download |
-| My Growth | `index.html#my-growth` | Before/after, improvement and further development |
-| Reflective Summary | `index.html#final-reflection` | Reflective Summary narrative, handwritten quote and journal polaroid |
-| Contact Me | `index.html#contact-me` | Disabled-until-configured email, region, optional professional link, closing thanks |
+| Chapter             | Deep link                        | Composition                                                                                              |
+| ------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Home                | `index.html#home`                | Classroom hero, portrait welcome, internship glance, three sample metrics, two polaroids, quote          |
+| About Me            | `index.html#about-me`            | Biography, timeline, portrait, strengths sticky note, hobbies                                            |
+| My Internship       | `index.html#my-internship`       | School image, facts, responsibilities, learning                                                          |
+| Teaching Philosophy | `index.html#teaching-philosophy` | Intro and four principle strips                                                                          |
+| Lesson Plans        | `index.html#lesson-plans`        | Week 01–06, one uploadable/downloadable PDF each                                                         |
+| My Learners         | `index.html#my-learners`         | Separate Grade 6/Grade 9 profiles with multi-paragraph introductions, characteristics, needs and support |
+| Teaching in Action  | `index.html#teaching-in-action`  | Up to 30 photos and 3 playable video clips; captions/descriptions/details and accessible image viewer    |
+| Testimonials        | `index.html#testimonials`        | Four PDF sections: observations (2), principal/teacher consent (2), timetable (1), completion letter (1) |
+| Reflective Journey  | `index.html#reflective-journey`  | Four reflection panels; no sample journal download                                                       |
+| My Growth           | `index.html#my-growth`           | Before/after, improvement and further development                                                        |
+| Reflective Summary  | `index.html#final-reflection`    | Reflective Summary narrative, handwritten quote and journal polaroid                                     |
+| Contact Me          | `index.html#contact-me`          | Disabled-until-configured email, region, optional professional link, closing thanks                      |
 
 Hash navigation needs no server rewrite rules. Unknown hashes return Home. Browser back/forward and direct deep links work.
 
@@ -75,11 +75,19 @@ Portfolio copy is data-driven. Static interface instructions, editor labels, dem
 
 Upload actual PDFs in Lesson Plans (Week 01–06) and Testimonials (two observation forms, principal and teacher consent, timetable, completion letter). Blank slots have no download. Uploaded PDFs are embedded and download directly; alternatively use safe local `resources/*.pdf` or `assets/*.pdf` paths and copy those files separately.
 
-Teaching in Action has Add photo / Add video clip controls, per-item upload, caption, description, details and removal. Up to **30 photos + 3 clips**; no pretend photos/videos appear in blank slots. Limits: photos **8 MB** input, resized to **1600 px**; PDFs **5 MB**; MP4/WebM videos **6 MB**; complete embedded draft **40 MB**. Base64 adds overhead. Use compressed files/short clips or safe local paths for larger media. Browser storage quotas may be lower. Provide descriptions/transcripts and captions for spoken video. The school logo is optional and blank until a genuine logo is uploaded in Pictures → schoolLogo.
+Teaching in Action has Add photo / Add video clip controls, per-item upload, caption, description, details and removal. Up to **30 photos + 3 clips**; no pretend photos/videos appear in blank slots. Limits: photos **8 MB** input, resized to **1600 px**; PDFs **15 MiB (15,728,640 bytes)**; MP4/WebM videos **6 MB**; complete embedded draft **40 MB**. Base64 adds overhead. Use compressed files/short clips or safe local paths for larger media. Browser storage quotas may be lower. Provide descriptions/transcripts and captions for spoken video. The school logo is optional and blank until a genuine logo is uploaded in Pictures → schoolLogo.
 
 **Signatures, signed consent and minors’ information become public on GitHub Pages. Keep originals private; use authorised, properly redacted copies only. Review legacyArchive too: non-rendered data is still public if deployed.**
 
 Email remains disabled until a valid email address is set. The enabled button uses `mailto:` and opens the visitor’s configured email application; **the website does not submit or store messages**. Profile links support full `https://` URLs. Local resources should start `resources/` or `assets/`. Script URLs are not accepted.
+
+## If a lesson PDF does not appear
+
+- Check the feedback directly below that week's upload control. Rejected files leave the previous PDF untouched. The editor requires the browser to identify the file as `application/pdf`, a `%PDF-` header, no more than 15 MiB (15,728,640 bytes) per PDF, and a complete draft under the existing 40 MiB content limit. An empty/other browser MIME type is rejected even if the filename ends in `.pdf`; the editor does not silently relax validation.
+- The **15 MiB per-PDF limit is not a capacity promise for every slot**: the unchanged **40 MiB aggregate** includes base64 expansion (about one third) and all other draft content. Two maximum-sized PDFs already use 40 MiB in base64 before metadata, so the second is rejected. Use authorised local `resources/` or `assets/` paths (copy files separately) or compress files when needed. Browser storage quotas can impose additional limits.
+- **PDF embedded** means the upload reached this tab's draft, not the public website. Use **Save draft** and reopen the same browser/path to verify a local save; use **Preview changes** to check the draft. Export/import preserves a portable backup. An ordinary `index.html` still uses its loaded `content.js` until that file is replaced or an authorised publish/deployment completes.
+- A saved browser draft restores its own earlier content, even if the loaded `content.js` has changed. Export it before choosing **Reset to loaded content** or **Reload remote content**; those actions replace rather than merge edits.
+- For diagnosis, retain the failing PDF, the exact editor URL/browser, the feedback text, and the relevant exported `content.js` or saved draft privately. A screenshot of a blank public slot alone cannot identify whether upload validation, local saving, file replacement or deployment failed. Never upload private teacher/student documents to a public issue.
 
 ## Publish
 
