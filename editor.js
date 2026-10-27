@@ -182,7 +182,7 @@
     const note = document.createElement("p");
     note.textContent =
       PortfolioAssets.privacy +
-      " Photos: JPG/PNG/WebP up to 8 MB, resized to 1600 px. Clips: MP4/WebM up to 6 MB each. PDFs: 5 MB each. Embedded content total: 40 MB. Large media should use local assets/ paths; export does not copy local files. Browser preview/storage may have lower quotas.";
+      " Photos: JPG/PNG/WebP up to 8 MB, resized to 1600 px. Clips: MP4/WebM up to 6 MB each. PDFs: up to 15 MiB (15,728,640 bytes) each. Embedded content total: 40 MB. Large media should use local assets/ paths; export does not copy local files. Browser preview/storage may have lower quotas.";
     area.append(note);
     [
       ["gallery", "photo", 30],
@@ -350,11 +350,24 @@
     input.accept = "application/pdf";
     const state = document.createElement("p");
     state.textContent = file.href ? "PDF added" : "PDF not added yet";
+    const feedback = document.createElement("p");
+    feedback.className = "pdf-feedback";
+    feedback.id = id + "-feedback";
+    feedback.setAttribute("aria-live", "polite");
+    input.setAttribute("aria-describedby", feedback.id);
+    const report = (message) => {
+      feedback.textContent = message;
+      status(message);
+    };
     input.addEventListener("change", async () => {
       const f = input.files[0];
       if (!f || busy || processing) return;
-      if (f.type !== "application/pdf" || f.size > 5 * 1024 * 1024) {
-        status("Choose a PDF smaller than 5 MB.");
+      if (f.type !== "application/pdf") {
+        report("Choose a PDF identified by the browser as application/pdf.");
+        return;
+      }
+      if (f.size > 15 * 1024 * 1024) {
+        report("PDF exceeds the 15 MiB (15,728,640 bytes) per-file limit.");
         return;
       }
       processing++;
@@ -370,12 +383,12 @@
           );
         state.textContent = "PDF added";
         changed();
-        status(
+        report(
           "PDF embedded in draft. Save draft or export content.js; the website has not changed.",
         );
       } catch (error) {
         file.href = previous;
-        status("PDF could not be added. " + error.message);
+        report("PDF could not be added. " + error.message);
       } finally {
         processing--;
         $("#publish").disabled = busy || !ready;
@@ -408,7 +421,7 @@
           "Use a safe resources/ or assets/ PDF path. Copy the file into that folder too.",
         );
     });
-    group.append(label, input, state, remove, pathLabel, path);
+    group.append(label, input, state, feedback, remove, pathLabel, path);
     container.append(group);
   }
   function choices() {

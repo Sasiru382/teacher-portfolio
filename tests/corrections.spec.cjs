@@ -357,9 +357,11 @@ test("blank public assets are honest and oversized or unsafe uploads never chang
     .setInputFiles({
       name: "large.pdf",
       mimeType: "application/pdf",
-      buffer: Buffer.alloc(5 * 1024 * 1024 + 1),
+      buffer: Buffer.alloc(15 * 1024 * 1024 + 1),
     });
-  await expect(page.getByRole("status")).toContainText("smaller than 5 MB");
+  await expect(page.getByRole("status")).toContainText(
+    "15 MiB (15,728,640 bytes) per-file limit",
+  );
   await page.locator("#chapter-choice").selectOption("teaching-in-action");
   await page
     .getByRole("button", { name: "Add video clip", exact: true })
