@@ -73,6 +73,7 @@ async function assertDownloads(page, expected) {
   }
 }
 async function fixture(data, hosted = false) {
+  fs.mkdirSync(scratch, { recursive: true });
   const dir = fs.mkdtempSync(path.join(scratch, "lesson-pdf-"));
   for (const name of [
     "editor.html",
