@@ -18,7 +18,7 @@ All images and fonts are stored locally. The website works with `file://` and st
 - Choose **Pictures** to upload JPG/PNG/WebP images, add accurate image descriptions and optionally set a local image filename.
 - Uploads are embedded in the exported data; large images are resized to a 1600-pixel maximum. Files over 8 MB are rejected. Keep originals backed up.
 - Click **Export content.js**. Rename the download exactly `content.js` and replace the file next to index.html. Refresh the website.
-- **Import content.js** resumes an exported draft. It parses JSON, never evaluates uploaded JavaScript, and validates the full twelve-page data structure. Original fourteen-page exports/drafts migrate safely; the complete original is retained in non-rendered `legacyArchive`, which is included in exports and must be reviewed for privacy before publication.
+- **Import content.js** resumes an exported draft. It parses JSON, never evaluates uploaded JavaScript, and validates the full twelve-page data structure. Original fourteen-page exports/drafts migrate safely; the original fourteen-page data is retained in non-rendered `legacyArchive`, which is included in exports and must be reviewed for privacy before publication.
 - **Preview changes** is temporary and uses session storage, with IndexedDB fallback for large media drafts. Some browsers restrict storage for local files; export/replace/refresh is the fallback.
 - **Save draft** writes text and embedded pictures to IndexedDB, scoped to this origin and editor path. Reopening restores the saved draft. It does not change the public site. Edits since the last save trigger a close warning (browser support varies). Save is explicit, not automatic.
 - Reset returns to the loaded file in the editing tab; save afterward to replace the stored draft. It never updates GitHub.
@@ -34,7 +34,9 @@ For precise image filenames, slots, page placements, sizes, caption edits, certi
 - The two requested class profiles are Grade 6 and Grade 9; existing shared characteristics, needs and support information remains.
 - Achievements and Evidence Hub are removed from the twelve active routes. Reflective Summary keeps `final-reflection` for old deep links. The sample journal file/link is removed and its generator no longer creates it.
 - No genuine school logo, photos, clips, PDFs or endorsements were supplied. Those new slots start blank. Media under `tests/` is explicitly synthetic test material, excluded from the deployment workflow.
-- Complete original fourteen-page exports and saved IndexedDB drafts are migrated on import/restore; a lossless `legacyArchive` retains original content without rendering it. **An archive is not private:** its bytes are included in exported/published content. Review it before sharing; a developer can remove the `legacyArchive` property from a backed-up export if that history should not travel with the public file. Original SHA conflict checks remain intact.
+- Complete original fourteen-page exports and saved IndexedDB drafts are migrated on import/restore; a `legacyArchive` retains other original content without rendering it. **An archive is not private:** its bytes are included in exported/published content. Review it before sharing; a developer can remove the `legacyArchive` property from a backed-up export if that history should not travel with the public file. Original SHA conflict checks remain intact.
+
+Previous twelve-page exports and actual saved drafts with four Testimonials sections also migrate. The known second section (principal/teacher consent, identified by fixed slot order, not editable titles) and its PDF bytes are deliberately discarded, including in known nested `legacyArchive` portfolios. The remaining three sections/four PDFs, custom titles, copy, photos and up to three clips are preserved. Keep the original export offline if you need those consent records; they are not secretly retained in new exports. This does not erase already deployed files, repository history, old browser data or separate local assets: replace old public content and remove any sensitive standalone files separately. Saved base content is normalised consistently; original SHA conflict checks remain.
 
 ## All twelve pages
 
@@ -47,7 +49,7 @@ For precise image filenames, slots, page placements, sizes, caption edits, certi
 | Lesson Plans        | `index.html#lesson-plans`        | Week 01–06, one uploadable/downloadable PDF each                                                         |
 | My Learners         | `index.html#my-learners`         | Separate Grade 6/Grade 9 profiles with multi-paragraph introductions, characteristics, needs and support |
 | Teaching in Action  | `index.html#teaching-in-action`  | Up to 30 photos and 3 playable video clips; captions/descriptions/details and accessible image viewer    |
-| Testimonials        | `index.html#testimonials`        | Four PDF sections: observations (2), principal/teacher consent (2), timetable (1), completion letter (1) |
+| Testimonials        | `index.html#testimonials`        | Three PDF sections: observations (2), timetable (1), completion letter (1) |
 | Reflective Journey  | `index.html#reflective-journey`  | Four reflection panels; no sample journal download                                                       |
 | My Growth           | `index.html#my-growth`           | Before/after, improvement and further development                                                        |
 | Reflective Summary  | `index.html#final-reflection`    | Reflective Summary narrative, handwritten quote and journal polaroid                                     |
@@ -69,11 +71,11 @@ Hash navigation needs no server rewrite rules. Unknown hashes return Home. Brows
 - `tests/`: Node content/document tests, Playwright offline browser tests, asset/resource regeneration scripts.
 - `screenshots/`: verification captures when present; not required for production.
 
-Portfolio copy is data-driven. Static interface instructions, editor labels, demo safety reminders and printable resource bodies are in their relevant HTML/JS files. To substantially change layouts, edit the renderer and CSS rather than content.js. The twelve route IDs and fixed document/profile counts are validated; gallery arrays can grow/shrink within 30 photos and 3 clips. Blank lines split philosophy and class-profile paragraphs, with HTML escaped.
+Portfolio copy is data-driven. Static interface instructions, editor labels, demo safety reminders and printable resource bodies are in their relevant HTML/JS files. To substantially change layouts, edit the renderer and CSS rather than content.js. The twelve route IDs and fixed document/profile counts are validated; gallery arrays can grow/shrink within 30 photos and 3 clips. Blank lines split philosophy, class-profile introductions, and Reflective Summary introduction/body paragraphs, with HTML escaped. Use Enter twice in the multiline editor; save or export to keep the paragraph breaks.
 
 ## Documents and contact
 
-Upload actual PDFs in Lesson Plans (Week 01–06) and Testimonials (two observation forms, principal and teacher consent, timetable, completion letter). Blank slots have no download. Uploaded PDFs are embedded and download directly; alternatively use safe local `resources/*.pdf` or `assets/*.pdf` paths and copy those files separately.
+Upload actual PDFs in Lesson Plans (Week 01–06) and Testimonials (two observation forms, timetable, completion letter). Blank slots have no download. Uploaded PDFs are embedded and download directly; alternatively use safe local `resources/*.pdf` or `assets/*.pdf` paths and copy those files separately.
 
 Teaching in Action has Add photo / Add video clip controls, per-item upload, caption, description, details and removal. Up to **30 photos + 3 clips**; no pretend photos/videos appear in blank slots. Limits: photos **8 MB** input, resized to **1600 px**; PDFs **15 MiB (15,728,640 bytes)**; MP4/WebM videos **6 MB**; complete embedded draft **40 MB**. Base64 adds overhead. Use compressed files/short clips or safe local paths for larger media. Browser storage quotas may be lower. Provide descriptions/transcripts and captions for spoken video. The school logo is optional and blank until a genuine logo is uploaded in Pictures → schoolLogo.
 

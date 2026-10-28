@@ -24,7 +24,7 @@ async function exportData(page) {
     ),
   };
 }
-test("six lesson PDFs and four evidence sections upload, download, clear and round-trip safely", async ({
+test("six lesson PDFs and three evidence sections upload, download, clear and round-trip safely", async ({
   page,
   context,
 }) => {
@@ -40,7 +40,7 @@ test("six lesson PDFs and four evidence sections upload, download, clear and rou
   await page.locator("#chapter-choice").selectOption("testimonials");
   await expect(
     page.locator('input[type=file][accept="application/pdf"]'),
-  ).toHaveCount(6);
+  ).toHaveCount(4);
   await expect(page.locator("#text-fields")).toContainText("signatures");
   await page
     .getByLabel("Upload PDF for Observation form 1", { exact: true })
@@ -67,7 +67,7 @@ test("six lesson PDFs and four evidence sections upload, download, clear and rou
   await p.getByRole("link", { name: "Download PDF: Week 01" }).click();
   expect(fs.readFileSync(await (await downloaded).path())).toEqual(pdf.buffer);
   await p.goto(url("index.html") + "?preview=1#testimonials");
-  await expect(p.locator(".document-section")).toHaveCount(4);
+  await expect(p.locator(".document-section")).toHaveCount(3);
   await expect(
     p.getByRole("link", { name: "Download PDF: Observation form 1" }),
   ).toBeVisible();

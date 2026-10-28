@@ -95,9 +95,10 @@
             genuine work.
           </li>
           <li>
-            Use blank lines in Teaching Philosophy → Body and the two My
-            Learners → Profiles → Introduction fields to start new paragraphs.
-            Text is displayed literally, not as HTML.
+            Use blank lines (press Enter twice) in Reflective Summary →
+            Introduction and Paragraphs, Teaching Philosophy → Body and the two
+            My Learners → Profiles → Introduction fields to start new
+            paragraphs. Text is displayed literally, not as HTML.
           </li>
           <li>
             Select <strong>Preview changes</strong>. This opens a temporary
@@ -285,10 +286,9 @@
         <h2>4. Upload lesson PDFs and internship records</h2>
         <p>
           Lesson Plans has Week 01 through Week 06. Each row accepts one real
-          PDF. Testimonials contains four sections: Classroom observation forms
-          (two PDFs), Signed consent of principal and teacher (two PDFs),
-          Timetable (one PDF), and Internship completion letter (one PDF). No
-          documents are supplied; blank rows have no download links.
+          PDF. Testimonials contains three sections: Classroom observation forms
+          (two PDFs), Timetable (one PDF), and Internship completion letter (one
+          PDF). No documents are supplied; blank rows have no download links.
         </p>
         <ol>
           <li>
@@ -337,16 +337,24 @@
         <h3>Older exports and saved drafts</h3>
         <p>
           The editor safely parses JSON only. Complete original fourteen-chapter
-          exports and saved drafts migrate to twelve active chapters. Your
-          original data is retained in a non-rendered legacyArchive field so no
-          old copy is silently lost. Custom legacy gallery photos are retained;
-          stock illustration placeholders are not promoted to actual photos.
-          Retired pages, old lesson/feedback copy and journal links remain only
-          in the archive. Review/remove private archived data before publishing;
-          exports include it. Old saved base versions are normalised for
-          conflict checking, but original SHA guards remain. A changed remote
-          base still requires an explicit reload; migration never silently
-          publishes or overwrites remote content.
+          exports and saved drafts migrate to twelve active chapters. Your other
+          original data is retained in a non-rendered legacyArchive field.
+          Custom legacy gallery photos are retained; stock illustration
+          placeholders are not promoted to actual photos. Retired pages, old
+          lesson/feedback copy and journal links remain only in the archive.
+          Review/remove private archived data before publishing; exports include
+          it. Old saved base versions are normalised for conflict checking, but
+          original SHA guards remain. A changed remote base still requires an
+          explicit reload; migration never silently publishes or overwrites
+          remote content. Previous twelve-chapter exports and actual saved
+          drafts with four Testimonials sections also migrate. The old second
+          section (principal/teacher consent) and its PDF bytes are deliberately
+          dropped, even when its titles were customised and even inside known
+          legacyArchive portfolios. Other PDFs, titles, copy, pictures and clips
+          remain. Keep your original export offline for your private backup;
+          removed consent is not hidden in new exports. Migration cannot erase
+          old deployed content, repository history, browser data or separately
+          copied files: remove any sensitive public originals separately.
         </p>
       </section>
       <section id="publish">
