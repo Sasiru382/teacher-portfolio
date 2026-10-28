@@ -111,8 +111,7 @@
   function normalize(input, template) {
     tree(input);
     tree(template);
-    if (JSON.stringify(input).length > window.PortfolioAssets.maxContent)
-      throw Error("Content exceeds 40 MB");
+    window.PortfolioAssets.checkContent(input);
     let value = clone(input);
     removeConsent(value);
     template = clone(template);
@@ -207,10 +206,7 @@
             if (media.src && !window.PortfolioAssets[kind](media.src))
               throw Error("Unsafe media");
     }
-    if (JSON.stringify(value).length > window.PortfolioAssets.maxContent)
-      throw Error(
-        "Migrated content exceeds 40 MB. Keep your original export and ask for help.",
-      );
+    window.PortfolioAssets.checkContent(value);
     return value;
   }
   // Legacy shape is an inert string-only skeleton, never executable imported code.

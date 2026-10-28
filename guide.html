@@ -157,7 +157,7 @@
               </li>
             </ol>
             <p>
-              The editor accepts up to 8 MB per picture and resizes large
+              The editor accepts up to 8 MiB per picture and resizes large
               pictures to a maximum of 1600 pixels. Aim for under 500 KB per
               photo where practical. Embedding many photos makes content.js
               larger; for a large gallery, use the manual method instead.
@@ -310,22 +310,42 @@
         <h3>Teaching in Action: photos and clips</h3>
         <p>
           Choose Teaching in Action under Text &amp; links. Add up to 30 photos
-          and 3 video clips. Upload JPG/PNG/WebP photos (8 MB maximum, resized
-          to 1600 px), or MP4/WebM clips (6 MB maximum). Each item has an
-          editable caption, description and details, local path and Remove
-          button. Empty items are not shown as real media. Visitors can enlarge
-          photos and play clips using real video controls. Include a useful text
-          description/transcript for accessible video content; obtain captions
-          for speech before publishing.
+          and 3 video clips. Upload JPG/PNG/WebP photos (8 MiB maximum, resized
+          to 1600 px), or MP4/WebM clips (15 MiB / 15,728,640 bytes maximum,
+          inclusive). Each item has an editable caption, description and
+          details, local path and Remove button. Empty items are not shown as
+          real media. Visitors can enlarge photos and play clips using real
+          video controls. Include a useful text description/transcript for
+          accessible video content; obtain captions for speech before
+          publishing.
         </p>
         <p>
-          The total embedded portfolio is limited to 40 MB. Base64 increases
-          file size; many photos/videos may make the site slow. Compress files,
-          use short clips, or use assets/ paths for larger media. Export does
-          not upload/copy local files. Browser quotas may be lower: keep
-          portable exports. Preview uses session storage for small drafts and
-          local IndexedDB for large ones; the public site never loads preview
-          data without ?preview=1.
+          The local content budget is 100 MiB (104,857,600 bytes), inclusive,
+          measured as UTF-8 bytes of compact JSON including all media, text,
+          metadata and legacy archives. Base64 adds about one third: aim for
+          roughly 70 MiB of combined original media. The theoretical 75 MiB
+          base64-only ceiling leaves no space for text or metadata and is not a
+          guarantee; large custom text/archives reduce available media space.
+          Photos are resized/re-encoded, so selected original sizes do not map
+          exactly. Per-file 8/15/15 MiB limits apply to original selected
+          photos/PDFs/clips. Large drafts may be slow and need several times
+          their serialized size in browser memory. Compress files, use short
+          clips, or use assets/ paths for larger media. Export does not
+          upload/copy local files. Browser quotas may be lower: keep portable
+          exports. Preview uses session storage for small drafts and local
+          IndexedDB for large ones; the public site never loads preview data
+          without ?preview=1.
+        </p>
+        <p>
+          Import accepts a separate 101 MiB file envelope for
+          assignment/comments and whitespace, but parsed and migrated content
+          must each fit the 100 MiB compact-JSON budget. Exports automatically
+          use compact JSON if pretty formatting would exceed that envelope.
+          GitHub has a separate 100 MiB limit on the final file, including
+          assignment and formatting; the editor refuses oversized files before
+          sending a write. GitHub API limits may be lower. A maximum-sized local
+          draft is not a promise of successful publication. Use local media
+          paths or reduce embedded media.
         </p>
         <p class="note">
           Privacy warning: everything in content.js and deployed assets is

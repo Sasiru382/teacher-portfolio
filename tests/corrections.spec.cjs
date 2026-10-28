@@ -369,7 +369,7 @@ test("blank public assets are honest and oversized or unsafe uploads never chang
   await page.getByLabel("Upload video 1", { exact: true }).setInputFiles({
     name: "large.webm",
     mimeType: "video/webm",
-    buffer: Buffer.alloc(6 * 1024 * 1024 + 1),
+    buffer: Buffer.alloc(15 * 1024 * 1024 + 1),
   });
   await expect(page.getByRole("status")).toContainText("too large");
   await page
@@ -407,7 +407,13 @@ test("logo can be cleared and unsafe fixed picture paths are refused without bro
   await expect(page.getByRole("status")).toContainText("Unsaved");
   await page
     .getByLabel("Optional local filename for schoolLogo", { exact: true })
-    .fill("assets/logo.png");
+    .fill("assets/classroom-photo.jpg");
+  // Commit a real local-path change before clearing it. After an upload the
+  // synchronized field is already blank, so typing then undoing before blur
+  // correctly leaves the embedded picture unchanged (no change event).
+  await page
+    .getByLabel("Optional local filename for schoolLogo", { exact: true })
+    .blur();
   await page
     .getByLabel("Optional local filename for schoolLogo", { exact: true })
     .fill("");
@@ -426,7 +432,7 @@ test("fixed picture uploads also enforce the aggregate draft limit", async ({
   await page
     .getByLabel("Upload picture for hero", { exact: true })
     .setInputFiles(path.join(root, "assets/classroom-photo.jpg"));
-  await expect(page.getByRole("status")).toContainText("40 MB");
+  await expect(page.getByRole("status")).toContainText("100 MiB");
   expect((await exportData(page)).data.images.hero.src).toBe(
     "assets/classroom-photo.jpg",
   );

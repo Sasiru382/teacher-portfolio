@@ -26,6 +26,31 @@
   max-width: 890px;
   font-size: 14px;
 }
+.upload-budget-help {
+  border: 1px solid #c8b8d3;
+  border-left: 4px solid #684a83;
+  border-radius: 6px;
+  padding: 16px 18px;
+  margin: 20px 0;
+  background: #eee6f2;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.upload-budget-help h2 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.upload-budget-help ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.upload-budget-help li + li {
+  margin-top: 6px;
+}
+.upload-budget-help p {
+  margin: 10px 0 0;
+  font-size: 13px;
+}
 .editor-steps {
   display: flex;
   gap: 35px;

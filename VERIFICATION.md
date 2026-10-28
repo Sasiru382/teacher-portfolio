@@ -6,7 +6,7 @@ Implemented locally on `main` at `60ea9f6`. No commit, push, branch switch, PR, 
 
 - Reflective Summary (`final-reflection`) now reuses the existing escaped paragraph renderer for its Introduction and each Paragraphs body field. Blank lines produce separate paragraphs in public HTML and editor preview. Header structure/decoration remains; the editor retains its keyboard-accessible multiline textarea.
 - Testimonials now has three sections/four PDF slots: observation forms (2), timetable (1), completion letter (1). The principal/teacher consent section is removed from default content and editor/public views. Guide and README describe only the remaining slots and explain migration/privacy.
-- Twelve routes, three video clips, 15 MiB per-PDF and 40 MiB aggregate limits are unchanged. No actual teacher content was supplied or invented.
+- Twelve routes, three video clips and the 15 MiB per-PDF limit are unchanged. The later aggregate-budget change raises the local content budget to 100 MiB compact-JSON UTF-8 bytes; see `AGGREGATE-VERIFICATION.md`. No actual teacher content was supplied or invented.
 
 ## Executed checks
 
