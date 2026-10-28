@@ -1,6 +1,13 @@
 (() => {
   "use strict";
-  const original = JSON.stringify(window.PORTFOLIO_CONTENT);
+  const original = JSON.stringify(
+    PortfolioSchema.normalize(
+      window.PORTFOLIO_CONTENT,
+      window.PORTFOLIO_CONTENT,
+    ),
+  );
+  const migrationNotice =
+    " Old four-section Testimonials data is migrated by dropping the principal/teacher consent section, including its PDF bytes, from exports and known legacy archives. Keep your original file offline as your backup; other document slots are preserved.";
   let draft = JSON.parse(original);
   const $ = (s) => document.querySelector(s);
   const status = (text) => ($("#editor-status").textContent = text);
@@ -147,7 +154,9 @@
           ? human(key)
           : `Text ${Number(key) + 1}`;
         const input = document.createElement(
-          ["body", "intro"].includes(key) || String(val).length > 95
+          ["body", "intro"].includes(key) ||
+            (chapter === "final-reflection" && prefix === "Paragraphs ") ||
+            String(val).length > 95
             ? "textarea"
             : "input",
         );
@@ -615,9 +624,10 @@
       renderFields();
       pictureFields();
       status(
-        draft.legacyArchive
-          ? "Imported and migrated legacy content to twelve chapters. Original data preserved in legacyArchive in exports: review archived private content before publishing."
-          : "Imported your content. Review it, then Save draft, export a backup, or publish.",
+        (draft.legacyArchive
+          ? "Imported and migrated legacy content to twelve chapters. Other original data preserved in legacyArchive in exports: review archived private content before publishing."
+          : "Imported your content. Review it, then Save draft, export a backup, or publish.") +
+          migrationNotice,
       );
     } catch (_) {
       status(
@@ -899,11 +909,16 @@
         baseContent = JSON.stringify(parseContent(saved.baseContent));
         baseSha = saved.baseSha;
         status(
-          draft.legacyArchive
-            ? "Saved legacy draft restored and migrated. Original data retained in legacyArchive; review privacy before publishing. Not published."
-            : "Saved draft restored from this browser. Not published.",
+          (draft.legacyArchive
+            ? "Saved legacy draft restored and migrated. Other original data retained in legacyArchive; review privacy before publishing. Not published."
+            : "Saved draft restored from this browser. Not published.") +
+            migrationNotice,
         );
-      } else status("Ready. Save draft keeps edits in this browser only.");
+      } else
+        status(
+          "Ready. Save draft keeps edits in this browser only." +
+            migrationNotice,
+        );
     } catch (_) {
       status(
         "Browser draft storage unavailable. Export content.js before closing to keep your work.",

@@ -1,64 +1,57 @@
-# Local correction verification
+# Local requested-correction verification
 
 ## Outcome and scope
 
-All requested correction slices are implemented locally. The branch remains `main` at `d9c091e`; no commit, push, publication, branch switch or GitHub-state change was performed. Existing publishing configuration remains fixed to `Sasiru382/teacher-portfolio`, `content.js`, `main`. The workflow was edited **locally only** to include the two new runtime scripts in future packaging.
+Implemented locally on `main` at `60ea9f6`. No commit, push, branch switch, PR, merge, publication or remote operation was performed. Publishing tests intercept GitHub requests locally; they do not contact/write GitHub.
 
-Assumption: Home items 4 and 5 mean the fourth/fifth “My Teaching Journey in Numbers” metrics: weekly reflections and classroom experiences. The three earlier metrics and all Internship at a Glance facts remain.
+- Reflective Summary (`final-reflection`) now reuses the existing escaped paragraph renderer for its Introduction and each Paragraphs body field. Blank lines produce separate paragraphs in public HTML and editor preview. Header structure/decoration remains; the editor retains its keyboard-accessible multiline textarea.
+- Testimonials now has three sections/four PDF slots: observation forms (2), timetable (1), completion letter (1). The principal/teacher consent section is removed from default content and editor/public views. Guide and README describe only the remaining slots and explain migration/privacy.
+- Twelve routes, three video clips, 15 MiB per-PDF and 40 MiB aggregate limits are unchanged. No actual teacher content was supplied or invented.
 
 ## Executed checks
 
-Final full run: `npm test`
+Final `npm test`: **9 Node tests passed; 53 Chromium Playwright tests passed; 0 failed**.
 
-- Node: **6 passed, 0 failed** (`248.090068 ms`).
-- Playwright Chromium: **34 passed, 0 failed** after the pre-commit review fix. The additional regression exercises an accepted `resources/` image path through editor export, preview, image decoding and enlargement; rendering now uses the same shared image policy as validation.
-- Automated axe WCAG 2/2.1 A/AA checks report no violations across the twelve public chapters, editor and guide. This is not full accessibility certification.
-- All twelve public deep links work offline; images decode; no public-site console/page errors or failed resources were reported.
-- HTTP static-host preview and ordinary unchanged public content are both exercised.
-- Real one-page PDF fixture upload/download was verified byte-for-byte, along with export/import round trips. The fixture was independently read with pypdf: one page containing “TEST FIXTURE ONLY - NOT TEACHER EVIDENCE”. It is not supplied teacher evidence.
-- Six weekly PDF slots, four document sections/six slots, removal, invalid PDF signatures, oversized PDFs, unsafe imported URLs and blank-state hiding are exercised.
-- Thirty uploaded photos and three actual WebM clips were imported/exported without data loss. A clip was actually played and paused. Caption, image description/details, gallery modal/focus handling and photo/video removal are exercised.
-- Mobile tests cover all public chapters at 390/320 px, and a populated 30-photo/3-video gallery at 320 px, including video elements with a 1920px width attribute. No horizontal overflow.
-- Philosophy and Grade 6/Grade 9 profile introductions preserve blank-line paragraph divisions; literal script-like text remains escaped, with no injected script element.
-- School-logo blank state, actual upload, clearing, and rejection of unsafe local picture paths are exercised. No genuine logo is included in default content.
-- Original fourteen-chapter JSON export and actual original-format IndexedDB saved draft both migrate to twelve active chapters. Custom copy and uploaded legacy gallery photos survive; the archive round-trips.
-- Existing publishing/security tests are retained: Unicode bytes, no stored token, no anonymous write, stale-base/SHA conflicts, explicit reload, HTTP 401/403/404/409/422 errors, failed network/verification, action locking, local storage failure, persisted drafts and unchanged public content. GitHub writes in these tests are intercepted Playwright responses, not actual GitHub operations.
+`node node_modules/prettier/bin/prettier.cjs --check '*.html' '*.css' '*.js' 'tests/*.cjs' 'resources/*.html' 'resources/*.css'`: all matched files pass. This is the configured source scope; generated JSON-shaped `content.js` remains intentionally ignored. `git diff --check`: passed.
 
-Formatting: `npx prettier --check *.html *.css *.js tests/*.cjs resources/*.html resources/*.css` — **all matched files pass**. `content.js` remains intentionally excluded so its assignment stays JSON-parseable.
+New targeted coverage:
 
-Whitespace: `git diff --check` — passed.
+- Introduction edited with actual Enter/Enter keyboard input, export, JSON-only import, Save draft, reopen, preview and exported content loaded as the ordinary public baseline. Blank-line body paragraphs also split; script/image-like markup displays literally and creates no injected elements.
+- Current default and old deployed twelve-page content render only three sections/four slots; the old-baseline editor/export also removes consent.
+- Previous exports with every section/file title customised preserve every other field, six lesson PDFs, four remaining evidence PDF byte strings, custom copy, photo metadata and clips. All four remaining evidence downloads match genuine synthetic PDF fixture bytes through import/save/reopen/preview.
+- Actual original-format twelve-page IndexedDB records are restored, not merely newly saved migrated drafts. Custom embedded photo/video data survives. Saved base is normalised independently from the edited draft; the original SHA survives save/reopen. Matching old remote base passes comparison; changed SHA with identical normalised content still triggers a conflict and no write.
+- Reopening exported content as the loaded baseline still accepts previous-format imports. A deployed archive-bearing baseline does not require incoming drafts to contain an archive.
+- Known consent sections inside legacyArchive are discarded, not hidden in a deployed archive. Existing fourteen-page import and original stored-draft migration tests still pass.
 
-Resource generation: `python tests/generate-resources.py` — **Created 7 genuine printable sample resources**. Verified that `resources/sample-reflection.html` was not recreated. Retained optional templates return to Home, not a retired route; they are no longer presented as active uploaded evidence.
+The full suite also verifies the unchanged 30-photo/3-video limits, playback, file/HTTP routes, all weekly PDF bytes and size boundaries, responsive layouts, local-only public assets, email configuration, draft isolation/storage fallback, mocked publishing conflict/error/read-back behavior, and automated axe checks. Automated accessibility checks are not full accessibility certification.
 
-Captures: `node tests/capture-all.cjs` — **24 captures for 12 chapters**. Parsed `screenshots/all-pages/manifest.json` and verified each listed file exists and no removed chapter is listed.
+## RED → GREEN evidence and issues
 
-## RED → GREEN evidence
+- Before renderer changes, the new summary test failed because `.page-intro p` had 0 paragraphs instead of 2. After reusing the existing escaped paragraph helper, it passed.
+- A short imported Reflective Summary body field initially became a single-line INPUT. Its targeted regression failed with INPUT rather than TEXTAREA; all Reflective Summary paragraph entries now stay multiline regardless of current length, avoiding newline loss on re-edit.
+- A mobile screenshot initially captured the sidebar halfway through its desktop-to-mobile slide-out transition. The capture now waits for the sidebar rectangle to leave the viewport and asserts no horizontal overflow.
+- Before consent/schema changes, all three migration regressions failed: old sections were retained, the default was `[2,2,1,1]` instead of `[2,1,1]`, and archived consent remained. They passed after structural migration/default changes.
+- A further old-deployed-baseline regression failed with four public sections instead of three; normalising loaded public/editor baselines made it pass.
+- The first full run exposed an existing dynamic-email regression because normalisation cloned the public global content. Assigning the normalised loaded baseline back to the same public global restored the existing behavior; final full run passes.
+- A new saved-draft test initially reloaded before the asynchronous save completed. It now waits for the explicit “Draft saved” status before reopen/read-back.
+- Broad shell-expanded formatter commands hit the tool lifecycle scan budget. Direct Node invocation with quoted globs completed the same configured formatting check; no dependency or runtime workaround was added.
 
-Each implementation slice was preceded by a failing regression, followed by a passing run. Observed missing behavior included: 14 rather than 12 routes; absent separate class profiles; no PDF upload controls; absent Add photo control; missing migration schema; overflow from wide videos; broken empty logo preview; missing aggregate limit on fixed-image uploads; obsolete routes in capture tooling; and misleading session-only preview wording.
+## Screenshots
 
-A real maximum-media run exposed browser sessionStorage quota exhaustion. The implemented fallback stores large previews locally in origin/path-scoped IndexedDB; an explicit status warns that this preview cache can persist. Export/replace remains the fallback if browser storage is unavailable. A first Prettier check required a second formatting pass for the long new regression file; the final check passes.
+Paths relative to `/home/sasiru/teacher-portfolio/` (generated/ignored verification artifacts, not deploy files):
 
-## Review screenshots
+- `screenshots/requested-summary-preview.png` — separate introduction/body paragraphs and literal escaped test markup, desktop.
+- `screenshots/requested-summary-mobile.png` — exported content as public baseline, mobile.
+- `screenshots/requested-testimonials-default.png` — actual current default, three blank sections/four slots.
+- `screenshots/requested-testimonials-editor.png` — old content loaded into editor, only four remaining upload controls with customised labels.
+- `screenshots/requested-testimonials-preview.png` — migrated test PDFs, only Custom section 0/2/3; section 1 is removed.
 
-All paths are relative to `/home/sasiru/teacher-portfolio/`:
+Desktop summary and migrated Testimonials screenshots were visually inspected: paragraph separation, heading/decoration and remaining PDF sections are visible without clipped content. Test screenshots use explicitly synthetic copy/media, not teacher evidence.
 
-- `screenshots/corrections-home-default.png` — actual blank-logo default Home.
-- `screenshots/corrections-home-desktop.png` — migrated **test draft**, using an empty-classroom photo in the logo upload slot to prove upload; this is not a genuine logo.
-- `screenshots/corrections-gallery-mobile.png` — 30 repeated test photos and 3 short black test clips, not real teacher media.
-- `screenshots/all-pages/05-lesson-plans-desktop.png` — six weekly blank PDF rows.
-- `screenshots/all-pages/06-my-learners-mobile.png` — separate Grade 6/Grade 9 profiles and retained shared support information.
-- `screenshots/all-pages/08-testimonials-desktop.png` — four document sections, six blank PDF slots and public-privacy warning.
-- `screenshots/all-pages/manifest.json` — current desktop/mobile chapter capture list.
+## Compatibility, privacy and limitations
 
-Home, mobile populated gallery, mobile learner profiles and document sections were visually inspected. No visible overflow or broken media was found in those inspected views.
+Migration identifies the fixed old second section by the known four-section `[2,2,1,1]` structural layout, never by editable labels. It deliberately drops that section, including embedded consent PDF bytes, from active content and recognised nested legacyArchive portfolios. It preserves the other data and rejects malformed active fixed-slot layouts. Keep the original export offline as the private backup. Import/restore/initial editor messages and the guide disclose this intentional deletion.
 
-## Compatibility and remaining limits
+The original fourteen-page archive mechanism remains for other displaced copy. Archives are still public if deployed: inspect them for unrelated private data. The cleanup is not a general document-content redactor and cannot detect consent copied into arbitrary custom fields or otherwise repurposed slots. It cannot erase an already deployed old content.js, repository history, previously saved browser data or standalone asset files; those require separate review/removal. Restoring does not silently overwrite the old stored browser record; explicit Save draft stores the migrated version.
 
-- The active schema fixes twelve ordered route IDs. `final-reflection` is retained, with label/title **Reflective Summary**. Achievements/Evidence Hub are not public routes; the reflection journal link/file is removed.
-- Complete original exports/drafts migrate on JSON-only import/restore. The full original object remains in non-rendered `legacyArchive` to avoid silent data loss. Original sample gallery illustrations are not promoted to real photos. Migrated active document slots start blank, rather than guessing old HTML resources are PDFs. Saved base content is normalised for comparison; saved SHA guards remain.
-- **Non-rendered does not mean private:** legacyArchive is included in exports and would be public if deployed. Review it and remove private archived information before publication. Keep an offline original backup if removing the archive.
-- No genuine school logo, classroom photos, videos, PDF documents or endorsements were supplied. New asset/document sections are honestly blank. Test fixtures live under tests/ and are excluded from deployment packaging.
-- Public GitHub Pages cannot protect signed consent, signatures or minors. Both editor and public document page warn to keep originals private and use only authorised, properly redacted copies.
-- Per-upload limits: photos 8 MB (resized to 1600px), PDFs 15 MiB (15,728,640 bytes), MP4/WebM clips 6 MB. Embedded draft limit: 40 MB. Base64 adds overhead; browser quotas may be lower. Larger media can use safe local assets/resources paths, but export does not copy those local files. Large previews may persist in browser IndexedDB; clear site data on shared devices.
-- Video codecs must be supported by the visitor’s browser. Native controls and descriptions/details are supplied; content owners must provide suitable speech captions/transcripts. Safari/Firefox were not exercised.
-- Live GitHub publishing and deployment were deliberately not exercised; they remain subject to explicit user approval after this report.
+No teacher-supplied updated content.js or private PDFs/videos were available. Verification uses synthetic fixtures. Browser coverage is Chromium, not Safari/Firefox. No live publishing/deployment was attempted; user approval is still required for any future remote action.

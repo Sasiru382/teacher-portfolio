@@ -29,6 +29,20 @@
     if (typeof base === "string") return typeof value === "string";
     if (Array.isArray(base)) {
       if (!Array.isArray(value)) return false;
+      if (path === ".pages.7.documents")
+        return (
+          value.length === 3 &&
+          [2, 1, 1].every(
+            (count, i) =>
+              typeof value[i]?.title === "string" &&
+              Array.isArray(value[i]?.files) &&
+              value[i].files.length === count &&
+              value[i].files.every(
+                (f) =>
+                  typeof f?.title === "string" && typeof f.href === "string",
+              ),
+          )
+        );
       if (
         (base.length === 0 || Object.hasOwn(base[0] || {}, "src")) &&
         (path.endsWith(".gallery") || path.endsWith(".videos"))
@@ -74,11 +88,37 @@
     )
       throw Error("Invalid JSON value");
   }
+  // Old editor slots were fixed in order, but every displayed title was editable.
+  // Drop only the second section of the known [2, 2, 1, 1] layout; never archive it.
+  function removeConsent(value) {
+    if (!value || typeof value !== "object") return;
+    const page = value.pages?.find?.((p) => p?.id === "testimonials");
+    const documents = page?.documents;
+    if (
+      Array.isArray(documents) &&
+      JSON.stringify(documents.map((s) => s?.files?.length)) === "[2,2,1,1]" &&
+      documents.every(
+        (s) =>
+          typeof s.title === "string" &&
+          s.files.every(
+            (f) => typeof f?.title === "string" && typeof f.href === "string",
+          ),
+      )
+    )
+      documents.splice(1, 1);
+    if (value.legacyArchive) removeConsent(value.legacyArchive);
+  }
   function normalize(input, template) {
     tree(input);
+    tree(template);
     if (JSON.stringify(input).length > window.PortfolioAssets.maxContent)
       throw Error("Content exceeds 40 MB");
     let value = clone(input);
+    removeConsent(value);
+    template = clone(template);
+    removeConsent(template);
+    // An archive is optional historical data, not a required baseline field.
+    delete template.legacyArchive;
     if (sameIds(value.pages, legacyIds)) {
       if (!shape(legacyShape, value))
         throw Error("Incomplete legacy portfolio");

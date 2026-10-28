@@ -1,6 +1,11 @@
 /* A static renderer: no fetch, framework, service worker or build step. */
 (async () => {
   "use strict";
+  // Normalise the loaded baseline too: an older content.js must not expose removed slots.
+  window.PORTFOLIO_CONTENT = PortfolioSchema.normalize(
+    window.PORTFOLIO_CONTENT,
+    window.PORTFOLIO_CONTENT,
+  );
   let data = window.PORTFOLIO_CONTENT;
   // The editor can open a session-only preview. Never replace exported content automatically.
   if (new URLSearchParams(location.search).has("preview")) {
@@ -114,7 +119,7 @@
     "my-growth": (p) =>
       `<div class="growth-comparison">${panel(p.beforeTitle, p.before, "before")}${panel(p.afterTitle, p.after, "after")}</div><div class="two-columns growth-details">${panel(p.improvedTitle, p.improved)}${panel(p.futureTitle, p.future)}</div><p class="handwritten page-note">${esc(p.note)}</p>`,
     "final-reflection": (p) =>
-      `<div class="final-layout"><div>${p.paragraphs.map((s) => `<p>${esc(s)}</p>`).join("")}<blockquote class="reflection-quote"><p>${esc(p.quote)}</p></blockquote></div>${polaroid("reflection", p.caption)}</div>`,
+      `<div class="final-layout"><div>${p.paragraphs.map(paragraphs).join("")}<blockquote class="reflection-quote"><p>${esc(p.quote)}</p></blockquote></div>${polaroid("reflection", p.caption)}</div>`,
     "contact-me": (p) =>
       `<div class="contact-layout"><section><p class="lead-copy">${esc(p.body)}</p><div class="contact-channels"><div>${icon(13)}<span>${data.site.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.site.email) ? `<a class="button" href="mailto:${esc(data.site.email)}">${esc(p.emailLabel)}</a><small>${esc(data.site.email)}</small>` : `<strong>${esc(p.disabledText)}</strong>`}</span></div><p class="email-note">${esc(p.emailNote)}</p><div>${icon(2)}<span><strong>${esc(p.locationLabel)}</strong><small>${esc(data.site.location)}</small></span></div>${safeLink(data.site.professionalLink) ? `<div>${icon(11)}<a href="${esc(safeLink(data.site.professionalLink))}" target="_blank" rel="noopener">${esc(data.site.professionalLabel)} ↗</a></div>` : ""}</div></section><div class="thank-you"><p class="handwritten">${esc(p.thanks)}</p><span aria-hidden="true">♡</span><img src="assets/botanical.svg" alt=""></div></div><blockquote class="closing-quote">${esc(p.closing)}</blockquote>`,
   };
@@ -181,7 +186,7 @@
     $("#main").innerHTML =
       p.id === "home"
         ? home(p)
-        : `<article class="chapter chapter-${esc(p.id)}"><header class="page-heading"><p class="eyebrow">${esc(p.eyebrow)}</p><h1>${esc(p.title)}</h1><p class="page-intro">${esc(p.intro)}</p><img src="assets/botanical.svg" alt="" class="heading-botanical"></header>${renderers[p.id](p)}</article>`;
+        : `<article class="chapter chapter-${esc(p.id)}"><header class="page-heading"><p class="eyebrow">${esc(p.eyebrow)}</p><h1>${esc(p.title)}</h1>${p.id === "final-reflection" ? `<div class="page-intro">${paragraphs(p.intro)}</div>` : `<p class="page-intro">${esc(p.intro)}</p>`}<img src="assets/botanical.svg" alt="" class="heading-botanical"></header>${renderers[p.id](p)}</article>`;
     document.title = `${p.title} · ${data.site.name}`;
     $("#navigation")
       .querySelectorAll("a")

@@ -328,7 +328,7 @@ window.PORTFOLIO_CONTENT = {
       "label": "Testimonials",
       "title": "Internship Documents",
       "eyebrow": "Feedback that helps me grow",
-      "intro": "Observation, consent and internship records. Only authorised, redacted copies belong on a public portfolio.",
+      "intro": "Observation and internship records. Only authorised, redacted copies belong on a public portfolio.",
       "documents": [
         {
           "title": "Classroom observation forms",
@@ -339,19 +339,6 @@ window.PORTFOLIO_CONTENT = {
             },
             {
               "title": "Observation form 2",
-              "href": ""
-            }
-          ]
-        },
-        {
-          "title": "Signed consent of principal and teacher",
-          "files": [
-            {
-              "title": "Principal consent",
-              "href": ""
-            },
-            {
-              "title": "Teacher consent",
               "href": ""
             }
           ]
