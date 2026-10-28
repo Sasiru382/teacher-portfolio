@@ -36,7 +36,7 @@ test("Week02 accepts a PDF at exactly the 15 MiB boundary and restores identical
   expect(fs.readFileSync(await (await wait).path())).toEqual(bytes);
   await preview.close();
   await page.locator("#chapter-choice").selectOption("lesson-plans");
-  // A second maximum-sized PDF exceeds the unchanged aggregate cap after base64.
+  // A second maximum-sized PDF now fits: the old 40 MiB cap rejected it.
   const first = page.getByLabel("Upload PDF for Week 01", { exact: true });
   await first.setInputFiles({
     name: "another-limit.pdf",
@@ -44,7 +44,7 @@ test("Week02 accepts a PDF at exactly the 15 MiB boundary and restores identical
     buffer: bytes,
   });
   await expect(first.locator("..").locator(".pdf-feedback")).toContainText(
-    "Portfolio exceeds 40 MB total",
+    "PDF embedded",
   );
   const exportWait = page.waitForEvent("download");
   await page.locator("#export").click();
@@ -56,6 +56,6 @@ test("Week02 accepts a PDF at exactly the 15 MiB boundary and restores identical
       .replace(/;$/, ""),
   );
   const weeks = data.pages.find((p) => p.id === "lesson-plans").weeks;
-  expect(weeks[0].href).toBe("");
+  expect(Buffer.from(weeks[0].href.split(",")[1], "base64")).toEqual(bytes);
   expect(Buffer.from(weeks[1].href.split(",")[1], "base64")).toEqual(bytes);
 });

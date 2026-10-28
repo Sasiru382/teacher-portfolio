@@ -191,7 +191,7 @@
     const note = document.createElement("p");
     note.textContent =
       PortfolioAssets.privacy +
-      " Photos: JPG/PNG/WebP up to 8 MB, resized to 1600 px. Clips: MP4/WebM up to 6 MB each. PDFs: up to 15 MiB (15,728,640 bytes) each. Embedded content total: 40 MB. Large media should use local assets/ paths; export does not copy local files. Browser preview/storage may have lower quotas.";
+      " Photos: JPG/PNG/WebP up to 8 MiB, resized to 1600 px. Clips: MP4/WebM up to 15 MiB (15,728,640 bytes) each. PDFs: up to 15 MiB (15,728,640 bytes) each. Total: 100 MiB of compact UTF-8 JSON, including text and archives. Aim for roughly 70 MiB combined original media; 75 MiB is only a base64-only theoretical ceiling. Resized photos may differ. Large media should use local assets/ paths; export does not copy local files. Large drafts can be slow and browser preview/storage may have lower quotas. Local capacity does not guarantee GitHub publication.";
     area.append(note);
     [
       ["gallery", "photo", 30],
@@ -239,10 +239,13 @@
               : ["video/mp4", "video/webm"];
           if (
             !types.includes(f.type) ||
-            f.size > (kind === "photo" ? 8 : 6) * 1024 * 1024
+            f.size >
+              (kind === "photo"
+                ? PortfolioAssets.maxPhoto
+                : PortfolioAssets.maxVideo)
           ) {
             status(
-              "Unsupported file or too large: photos up to 8 MB; MP4/WebM clips up to 6 MB.",
+              "Unsupported file or too large: photos up to 8 MiB; MP4/WebM clips up to 15 MiB (15,728,640 bytes), inclusive per selected file.",
             );
             return;
           }
@@ -268,8 +271,7 @@
                 0.88,
               );
             } else record.src = await readFile(f);
-            if (JSON.stringify(draft).length > PortfolioAssets.maxContent)
-              throw Error("40 MB total exceeded. Use local files.");
+            PortfolioAssets.checkContent(draft);
             state.textContent = "Media added";
             changed();
             status("Media embedded in draft. Save or export to keep it.");
@@ -375,7 +377,7 @@
         report("Choose a PDF identified by the browser as application/pdf.");
         return;
       }
-      if (f.size > 15 * 1024 * 1024) {
+      if (f.size > PortfolioAssets.maxPdf) {
         report("PDF exceeds the 15 MiB (15,728,640 bytes) per-file limit.");
         return;
       }
@@ -386,10 +388,7 @@
         if (!(await f.slice(0, 5).text()).startsWith("%PDF-"))
           throw Error("Not a PDF");
         file.href = await readFile(f);
-        if (JSON.stringify(draft).length > PortfolioAssets.maxContent)
-          throw Error(
-            "Portfolio exceeds 40 MB total. Use local files instead.",
-          );
+        PortfolioAssets.checkContent(draft);
         state.textContent = "PDF added";
         changed();
         report(
@@ -473,23 +472,42 @@
       input.type = "file";
       input.id = "upload-" + key;
       input.accept = "image/jpeg,image/png,image/webp";
+      const feedback = document.createElement("p");
+      feedback.className = "picture-feedback";
+      feedback.id = "upload-" + key + "-feedback";
+      feedback.setAttribute("aria-live", "polite");
+      input.setAttribute("aria-describedby", feedback.id);
+      const report = (message) => {
+        feedback.textContent = message;
+        status(message);
+      };
       input.addEventListener("change", async () => {
         const f = input.files[0];
         if (!f) return;
-        if (
-          !["image/jpeg", "image/png", "image/webp"].includes(f.type) ||
-          f.size > 8 * 1024 * 1024
-        ) {
-          status("Please choose a JPG, PNG or WebP picture smaller than 8 MB.");
+        if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) {
+          report(
+            "Picture not added: choose a JPG, PNG or WebP identified by the browser as an image. Previous picture kept.",
+          );
+          input.value = "";
+          return;
+        }
+        if (f.size > PortfolioAssets.maxPhoto) {
+          report(
+            "Picture not added: exceeds the 8 MiB (8,388,608 bytes) per-file limit. Previous picture kept.",
+          );
+          input.value = "";
           return;
         }
         if (busy || processing) {
-          status("Wait for the current action to finish.");
+          report(
+            "Picture not added: wait for the current action to finish. Previous picture kept.",
+          );
+          input.value = "";
           return;
         }
         processing++;
         $("#publish").disabled = true;
-        status("Processing picture… wait before saving or publishing.");
+        report("Processing picture… wait before saving or previewing.");
         const previous = slot.src;
         try {
           const bitmap = await createImageBitmap(f);
@@ -508,25 +526,27 @@
             f.type === "image/png" ? "image/png" : "image/jpeg",
             0.88,
           );
-          if (JSON.stringify(draft).length > PortfolioAssets.maxContent)
-            throw Error("40 MB total exceeded. Use local files.");
+          PortfolioAssets.checkContent(draft);
           img.src = slot.src;
           img.hidden = false;
+          path.value = "";
           source.textContent =
             "Slot: " + key + " · Uploaded picture embedded in export";
           changed();
+          feedback.textContent = `Picture embedded in draft: ${f.name}. Save draft or export to keep it; the website has not changed.`;
         } catch (error) {
           slot.src = previous;
-          status(
-            "This picture could not be added. Try a JPG, PNG or WebP file; keep embedded content below 40 MB. " +
+          report(
+            "This picture could not be added. Previous picture kept. " +
               error.message,
           );
         } finally {
           processing--;
           $("#publish").disabled = busy || !ready;
+          input.value = "";
         }
       });
-      fields.append(uploadLabel, input);
+      fields.append(uploadLabel, input, feedback);
       const altLabel = document.createElement("label");
       altLabel.htmlFor = "alt-" + key;
       altLabel.textContent = "Image description for " + key;
@@ -586,10 +606,10 @@
   $("#picture-tab").addEventListener("click", () => tab(true));
   $("#chapter-choice").addEventListener("change", renderFields);
   $("#export").addEventListener("click", () => {
-    const text =
-      "/* Exported with the local Portfolio Editor. Replace content.js with this file. */\nwindow.PORTFOLIO_CONTENT = " +
-      JSON.stringify(draft, null, 2) +
-      ";\n";
+    const text = PortfolioAssets.exportText(
+      draft,
+      "/* Exported with the local Portfolio Editor. Replace content.js with this file. */\nwindow.PORTFOLIO_CONTENT = ",
+    );
     const url = URL.createObjectURL(
       new Blob([text], { type: "text/javascript;charset=utf-8" }),
     );
@@ -611,7 +631,10 @@
     const file = e.target.files[0];
     if (!file) return;
     try {
-      if (file.size > 40 * 1024 * 1024) throw Error("size");
+      if (file.size > PortfolioAssets.maxImport)
+        throw Error(
+          "Import file exceeds the 101 MiB transport limit (100 MiB content plus formatting allowance). Export a compact backup or use local media paths.",
+        );
       const text = await file.text();
       const stripped = text.replace(/^\s*\/\*[\s\S]*?\*\/\s*/, "");
       const match = stripped.match(
@@ -629,9 +652,11 @@
           : "Imported your content. Review it, then Save draft, export a backup, or publish.") +
           migrationNotice,
       );
-    } catch (_) {
+    } catch (error) {
       status(
-        "Your file could not be imported. Choose a content.js exported by this editor; it must contain all twelve chapters. No uploaded code was executed.",
+        "Your file could not be imported. " +
+          error.message +
+          " Choose a content.js exported by this editor; it must contain all twelve chapters. No uploaded code was executed. Your previous draft is unchanged.",
       );
     }
     e.target.value = "";
@@ -662,16 +687,23 @@
       return;
     }
     try {
+      let previewUrl = "index.html?preview=1#home";
       try {
         sessionStorage.setItem(
           "teacher-portfolio-preview",
           JSON.stringify(draft),
         );
       } catch (_) {
-        sessionStorage.removeItem("teacher-portfolio-preview");
+        try {
+          sessionStorage.removeItem("teacher-portfolio-preview");
+        } catch (_) {
+          // Storage access itself may be blocked, not just full.
+        }
         await PortfolioAssets.previewStore("readwrite", draft);
+        // Explicitly select this snapshot's store, even if stale session data remains.
+        previewUrl = "index.html?preview=1&previewStore=indexeddb#home";
       }
-      window.open("index.html?preview=1#home", "_blank");
+      window.open(previewUrl, "_blank");
       status(
         "Preview opened; the public website is unchanged. A large draft may remain in this browser’s local preview cache. Save draft or export to keep a deliberate backup; clear site data on shared devices.",
       );
@@ -698,9 +730,10 @@
     return PortfolioSchema.normalize(value, JSON.parse(original));
   }
   const serialize = () =>
-    "/* Portfolio content. */\nwindow.PORTFOLIO_CONTENT = " +
-    JSON.stringify(draft, null, 2) +
-    ";\n";
+    PortfolioAssets.exportText(
+      draft,
+      "/* Portfolio content. */\nwindow.PORTFOLIO_CONTENT = ",
+    );
   function encode(text) {
     let binary = "";
     for (const byte of new TextEncoder().encode(text))
@@ -812,12 +845,17 @@
         )
       )
         return;
+      PortfolioAssets.checkContent(draft);
+      const text = serialize();
+      if (PortfolioAssets.utf8Bytes(text) > PortfolioAssets.maxGithubFile)
+        throw Error(
+          "The final content.js exceeds GitHub’s 100 MiB file limit after assignment/formatting overhead. Export a local backup and reduce embedded media; the local draft limit does not guarantee publication. GitHub API limits may be lower.",
+        );
       lock(true);
       publishStatus("Checking the latest repository version…");
       const current = await remote(token);
       if (!checkBase(current)) return;
       await saveDraft();
-      const text = serialize();
       publishStatus("Sending content to GitHub. Do not close this tab…");
       const result = await (
         await request(api, token, {

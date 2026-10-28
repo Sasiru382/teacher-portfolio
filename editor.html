@@ -26,6 +26,29 @@
         to update the public site. The editor is public; GitHub permissions
         protect publishing, not a hidden admin password.
       </p>
+      <section class="upload-budget-help" aria-labelledby="upload-limits-title">
+        <h2 id="upload-limits-title">Upload limits</h2>
+        <ul>
+          <li>
+            <strong>Per original file:</strong> Photos: 8 MiB; PDFs: 15 MiB;
+            Videos: 15 MiB, inclusive. Photos resize to 1600 px.
+          </li>
+          <li>
+            <strong>Gallery:</strong> 30 photos + 3 clips.
+            <strong>Total:</strong> 100 MiB encoded content (compact UTF-8 JSON,
+            including text and archives).
+          </li>
+          <li>
+            <strong>Plan for roughly 70 MiB combined original media</strong> —
+            not guaranteed; text, archives and photo re-encoding affect space.
+            Browser storage quotas may be lower; large drafts may be slow.
+          </li>
+        </ul>
+        <p>
+          Keep exports and private originals backed up. Local capacity does not
+          guarantee publication; publish only authorised, redacted content.
+        </p>
+      </section>
       <ol class="editor-steps">
         <li><span>1</span> Choose a chapter</li>
         <li><span>2</span> Edit text & pictures</li>
@@ -43,6 +66,7 @@
       <p id="editor-status" role="status" aria-live="polite">
         Opening your saved browser draft…
       </p>
+
       <div id="text-panel">
         <label for="chapter-choice">Choose a chapter</label
         ><select id="chapter-choice"></select>
@@ -51,7 +75,7 @@
       <div id="picture-panel" hidden>
         <h2>Your pictures</h2>
         <p>
-          Upload JPG, PNG or WebP (maximum 8 MB per image). The editor resizes
+          Upload JPG, PNG or WebP (maximum 8 MiB per image). The editor resizes
           large images to 1600 pixels and embeds a copy in your exported file,
           so no separate picture upload is needed. Keep originals backed up. Add
           a brief image description for screen-reader users.

@@ -302,11 +302,11 @@ test("PDF rejection reasons are visible beside Week02 and preserve a previously 
     }
     await page.evaluate(() => (PortfolioAssets.maxContent = 1000));
     await input.setInputFiles(pdf());
-    await expect(group).toContainText("40 MB");
+    await expect(group).toContainText("100 MiB");
     expect(weeks((await exportData(page)).data)[1].href).toBe(
       embedded(pdfBytes),
     );
-    await page.evaluate(() => (PortfolioAssets.maxContent = 40 * 1024 * 1024));
+    await page.evaluate(() => (PortfolioAssets.maxContent = 100 * 1024 * 1024));
     await input.setInputFiles(pdf());
     await expect(group.locator(".pdf-feedback")).toContainText("PDF embedded");
     await input.scrollIntoViewIfNeeded();

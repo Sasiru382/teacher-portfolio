@@ -10,7 +10,16 @@
   // The editor can open a session-only preview. Never replace exported content automatically.
   if (new URLSearchParams(location.search).has("preview")) {
     try {
-      const draft = sessionStorage.getItem("teacher-portfolio-preview");
+      let draft;
+      if (
+        new URLSearchParams(location.search).get("previewStore") !== "indexeddb"
+      ) {
+        try {
+          draft = sessionStorage.getItem("teacher-portfolio-preview");
+        } catch (_) {
+          // A blocked session store must not bypass the IndexedDB fallback.
+        }
+      }
       if (draft) data = JSON.parse(draft);
       else data = (await PortfolioAssets.previewStore("readonly")) || data;
     } catch (_) {
