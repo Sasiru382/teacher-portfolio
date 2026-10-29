@@ -70,7 +70,7 @@ Hash navigation needs no server rewrite rules. Unknown hashes return Home. Brows
 - `guide.html`, `guide.css`: illustrated personalisation and publishing guide.
 - `assets/`: original illustration placeholders, design SVGs, classroom photo, local fonts and font licences.
 - `resources/`: seven unused printable HTML templates (not linked as evidence) and their stylesheet.
-- `tests/`: Node content/document tests, Playwright offline browser tests, asset/resource regeneration scripts.
+- `tests/`: Node content/document tests, Playwright offline browser tests, asset/resource regeneration scripts. `npm test` runs the original demo regressions in an isolated temporary copy using `tests/demo-content.fixture.js`, then validates the actual root `content.js` and renders all twelve personalized chapters on desktop/mobile. This keeps editable names, document labels and embedded-media sizes from changing the demo test assumptions; it never replaces the published content.
 - `screenshots/`: verification captures when present; not required for production.
 
 Portfolio copy is data-driven. Static interface instructions, editor labels, demo safety reminders and printable resource bodies are in their relevant HTML/JS files. To substantially change layouts, edit the renderer and CSS rather than content.js. The twelve route IDs and fixed document/profile counts are validated; gallery arrays can grow/shrink within 30 photos and 3 clips. Blank lines split philosophy, class-profile introductions, and Reflective Summary introduction/body paragraphs, with HTML escaped. Use Enter twice in the multiline editor; save or export to keep the paragraph breaks.
