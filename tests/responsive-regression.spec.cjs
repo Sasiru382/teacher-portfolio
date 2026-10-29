@@ -1,4 +1,4 @@
-const { test, expect } = require("@playwright/test");
+const { test, expect } = require('./editor-test.cjs');
 const { pathToFileURL } = require("node:url");
 const path = require("node:path");
 const url = pathToFileURL(path.resolve(__dirname, "../index.html")).href;

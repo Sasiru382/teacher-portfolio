@@ -1,8 +1,8 @@
-const { test, expect } = require("@playwright/test");
+const { test, expect } = require('./editor-test.cjs');
 const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
-const origin = "http://portfolio.test";
+const origin = "https://portfolio.test";
 const api =
   "https://api.github.com/repos/Sasiru382/teacher-portfolio/contents/content.js";
 const initial = fs.readFileSync(path.join(root, "content.js"), "utf8");

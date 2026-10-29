@@ -16,7 +16,7 @@
     brand: "Sidebar portfolio title",
     subtitle: "Portfolio subtitle",
     qualification: "Qualification or professional description",
-    notice: "Demo-content notice (keep until all samples are replaced)",
+    notice: "Footer notice",
     footer: "Footer thank-you message",
     email: "Email address (blank disables email)",
     location: "City or region",

@@ -1,4 +1,4 @@
-const { test, expect } = require("@playwright/test");
+const { test, expect } = require('./editor-test.cjs');
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
@@ -77,6 +77,8 @@ async function fixture(data, hosted = false) {
   const dir = fs.mkdtempSync(path.join(scratch, "lesson-pdf-"));
   for (const name of [
     "editor.html",
+    "editor-access.js",
+    "editor-gate.js",
     "editor.js",
     "editor.css",
     "index.html",

@@ -1,4 +1,4 @@
-const { test, expect } = require("@playwright/test");
+const { test, expect } = require('./editor-test.cjs');
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 test("clear limits notice precedes editor controls and stays visible/readable on mobile", async ({

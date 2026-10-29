@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./editor-test.cjs');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
@@ -36,6 +36,6 @@ test('published JSON content validates losslessly and all twelve chapters render
   }
   expect(errors).toEqual([]);
   await page.goto(pathToFileURL(path.join(root, 'editor.html')).href);
-  await expect(page.locator('input').first()).toBeVisible();
+  await expect(page.locator('#editor-workspace input').first()).toBeVisible();
   expect(errors).toEqual([]);
 });
