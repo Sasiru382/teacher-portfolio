@@ -1,4 +1,4 @@
-const { test, expect } = require("@playwright/test");
+const { test, expect } = require('./editor-test.cjs');
 const fs = require("node:fs");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
@@ -140,7 +140,7 @@ test("old deployed content removes consent from public/editor and exports withou
 test("actual previous twelve-page IndexedDB drafts retain their saved base/SHA and custom media through migration", async ({
   page,
 }) => {
-  const origin = "http://portfolio.test";
+  const origin = "https://portfolio.test";
   const base = previousData();
   const draft = structuredClone(base);
   draft.site.name = "Saved custom teacher";

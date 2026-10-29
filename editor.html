@@ -7,24 +7,38 @@
     <link rel="icon" href="assets/book.svg" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="editor.css" />
-    <script src="asset-policy.js"></script>
-    <script src="content.js" defer></script>
-    <script src="schema.js" defer></script>
-    <script src="editor.js" defer></script>
+    <script src="editor-access.js" defer></script>
+    <script src="editor-gate.js" defer></script>
   </head>
   <body class="editor-body">
     <header class="editor-header">
       <a href="index.html">← Portfolio</a
       ><a href="guide.html">Help & picture guide</a>
+      <button id="editor-logout" class="button" type="button" hidden>Log out</button>
     </header>
-    <main class="editor-main">
+    <section id="editor-login" class="editor-main" aria-labelledby="editor-login-title">
+      <h1 id="editor-login-title">Unlock portfolio editor</h1>
+      <p>Enter your editor username and password. The public portfolio is open to everyone.</p>
+      <form id="editor-login-form">
+        <label for="editor-username">Username</label>
+        <input id="editor-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required />
+        <label for="editor-password">Password</label>
+        <input id="editor-password" name="password" type="password" autocomplete="current-password" required />
+        <button class="button primary" type="submit">Unlock editor</button>
+      </form>
+      <p id="editor-login-status" aria-live="polite"></p>
+      <p>This is a simple, bypassable browser gate, not secure authentication. All hosted files remain public. GitHub permissions still protect publishing.</p>
+      <noscript>JavaScript is required to unlock and use the editor.</noscript>
+    </section>
+    <main class="editor-main" id="editor-workspace" hidden>
       <p class="handwritten">Make this journey your own</p>
       <h1>Your Portfolio Editor</h1>
       <p class="editor-intro">
         Edit words and pictures, then <strong>Save draft</strong> in this
         browser. Use <strong>Publish to website</strong> with your GitHub token
-        to update the public site. The editor is public; GitHub permissions
-        protect publishing, not a hidden admin password.
+        to update the public site. This editor has a simple, bypassable browser
+        gate, not secure authentication. All hosted files remain public;
+        GitHub permissions protect publishing.
       </p>
       <section class="upload-budget-help" aria-labelledby="upload-limits-title">
         <h2 id="upload-limits-title">Upload limits</h2>

@@ -51,10 +51,15 @@
               <li>Make a backup copy of the entire folder before editing.</li>
             </ol>
             <p class="note">
-              The editor is not a login or a private admin system. It edits a
+              The editor asks for the username and password supplied by the owner.
+              This is a simple, bypassable browser gate, not secure authentication
+              or a private admin system. Reload, a new tab or Log out locks it again.
+              No credentials or unlock flags are saved in browser storage. It edits a
               draft in your browser. Save draft persists it on this device, not
               the website. Publish to website requires GitHub permission and
-              explicit confirmation. All published files are public.
+              explicit confirmation. All published files are public. Logout discards
+              unsaved edits, but does not erase saved drafts; export backups and
+              clear site data on shared devices.
             </p>
           </div>
           <div class="folder-diagram" aria-label="Folder organisation">
@@ -401,8 +406,8 @@
             <a href="https://github.com/login" target="_blank" rel="noopener"
               >GitHub</a
             >
-            separately using your own account. The editor does not have its own
-            login. Your account needs write access to
+            separately using your own account. The editor's convenience gate
+            does not grant GitHub access. Your account needs write access to
             <strong>Sasiru382/teacher-portfolio</strong>.
           </li>
           <li>

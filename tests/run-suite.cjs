@@ -18,8 +18,12 @@ try {
   fs.copyFileSync(path.join(root, 'tests/demo-content.fixture.js'), path.join(temp, 'content.js'));
   const units = fs.readdirSync(path.join(temp, 'tests')).filter(x => x.endsWith('.test.cjs')).map(x => 'tests/' + x);
   run(['--test', ...units], temp);
-  run([path.join(root, 'node_modules/@playwright/test/cli.js'), 'test', '--workers=2'], temp);
+  // The 100 MiB boundary test can exhaust a memory-limited runner when another
+  // media-heavy browser runs beside it. Allow serialization without skipping tests.
+  const workers = process.env.PORTFOLIO_TEST_WORKERS || '2';
+  run([path.join(root, 'node_modules/@playwright/test/cli.js'), 'test', '--workers=' + workers], temp);
   // Validate the real deployment too, rather than testing only the demo fixture.
+  run(['--test', 'tests/published-notice.check.cjs'], root);
   run([path.join(root, 'node_modules/@playwright/test/cli.js'), 'test', 'tests/published-content.spec.cjs', 'tests/hero-heart.spec.cjs', '--workers=1'], root);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });

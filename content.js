@@ -5,7 +5,7 @@ window.PORTFOLIO_CONTENT = {
     "brand": "My Teaching Journey ",
     "subtitle": "TEACHING INTERNSHIP E-PORTFOLIO",
     "qualification": "Final year BA (Hons) TESL Undergraduate | English Language Teacher",
-    "notice": "Demo portfolio · All stories, numbers, quotes and certificates are editable samples, not real claims.",
+    "notice": "Made with love and joy",
     "footer": "Thank you for being a part of my journey!",
     "email": "",
     "location": "Add your city or region",
